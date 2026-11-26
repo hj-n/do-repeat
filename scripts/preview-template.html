@@ -1,0 +1,88 @@
+<title>Do Repeat</title>
+<style>
+  /* Phone-sized app column, centered; framed like a device on wide screens. */
+  :root {
+    --page: #e3e5ea;
+    --app: #f4f5f7;
+    --frame: #c9cdd6;
+    --hint: #5e6472;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #07080a;
+      --app: #0f1115;
+      --frame: #2c313a;
+      --hint: #9aa1ae;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #07080a;
+    --app: #0f1115;
+    --frame: #2c313a;
+    --hint: #9aa1ae;
+    color-scheme: dark;
+  }
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    background: var(--page);
+    overflow: hidden;
+  }
+  #root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    background: var(--app);
+  }
+  .preview-hint {
+    display: none;
+  }
+  @media (min-width: 640px) and (min-height: 700px) {
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    #root {
+      flex: none;
+      width: 390px;
+      height: min(844px, calc(100% - 64px));
+      margin: 0;
+      border: 1px solid var(--frame);
+      border-radius: 36px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(15, 17, 21, 0.18);
+    }
+    .preview-hint {
+      display: block;
+      font: 12px/1.4 system-ui, sans-serif;
+      color: var(--hint);
+    }
+  }
+/*__CSS__*/
+</style>
+<div id="root"></div>
+<p class="preview-hint">Do Repeat 미리보기 · 실제 기기에서는 위치·카메라가 동작합니다</p>
+<script>
+  // Asset files sit next to this page; keep relative URLs pointing there,
+  // then put the app at "/" so the router starts on the first screen.
+  (function () {
+    try {
+      var dir = location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
+      var base = document.createElement('base');
+      base.href = dir;
+      document.head.appendChild(base);
+    } catch (e) {}
+    try {
+      if (location.pathname !== '/') history.replaceState(history.state, '', '/' + location.hash);
+    } catch (e) {}
+  })();
+</script>
+<!--__JS__-->
