@@ -1,0 +1,10 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Do Repeat",
+    "NSLocationWhenInUseUsageDescription": "Do Repeat checks that you're at your saved spot when you check in.",
+    "NSCameraUsageDescription": "Do Repeat uses the camera to take your check-in photo."
+  },
+  "android": {
+    "app_name": "Do Repeat"
+  }
+}

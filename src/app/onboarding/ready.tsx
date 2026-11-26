@@ -1,4 +1,5 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
@@ -7,40 +8,47 @@ import { Screen } from '@/components/screen';
 import { StepHeader } from '@/components/step-header';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { habitTitle, isPresetId } from '@/lib/habits';
+import { useAppStore } from '@/store/app-store';
 
-/** 온보딩 3단계: 고른 내용 확인 (홈 화면을 만들기 전 임시 마지막 화면) */
+import { finishOnboarding } from '@/features/onboarding/finish';
+
+/** 온보딩 3단계 (사진 인증): 확인하고 시작 */
 export default function ReadyScreen() {
   const theme = useTheme();
-  const { habit = '운동', method = 'location' } = useLocalSearchParams<{
-    habit?: string;
-    method?: string;
-  }>();
-  const methodLabel = method === 'photo' ? '사진 인증' : '위치 인증';
+  const { t } = useTranslation();
+  const { preset, custom } = useLocalSearchParams<{ preset?: string; custom?: string }>();
+  const addHabit = useAppStore((s) => s.addHabit);
+  const draft = { preset: isPresetId(preset) ? preset : undefined, customTitle: custom };
+
+  const start = () => {
+    addHabit({ ...draft, method: 'photo' });
+    finishOnboarding();
+  };
 
   return (
-    <Screen
-      footer={<Button kind="secondary" label="처음부터 다시" onPress={() => router.dismissTo('/')} />}>
+    <Screen footer={<Button label={t('common.start')} onPress={start} />}>
       <StepHeader step={3} total={3} />
 
       <View style={styles.heading}>
-        <AppText variant="title">준비됐어요</AppText>
-        <AppText color="textMuted">오늘 첫 인증을 하면 D+1부터 시작해요.</AppText>
+        <AppText variant="title">{t('onboarding.ready.title')}</AppText>
+        <AppText color="textMuted">{t('onboarding.ready.subtitle')}</AppText>
       </View>
 
       <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}>
         <View style={styles.cardTop}>
-          <AppText variant="bodyStrong">{habit}</AppText>
+          <AppText variant="bodyStrong">{habitTitle(draft, t)}</AppText>
           <View style={[styles.pill, { backgroundColor: theme.accentSoft }]}>
             <AppText variant="caption" color="accent">
-              {methodLabel}
+              {t('onboarding.method.photoTitle')}
             </AppText>
           </View>
         </View>
         <AppText variant="display" color="accent" style={styles.count}>
           D+0
         </AppText>
-        <AppText variant="label" color="textMuted" style={styles.note}>
-          아직 인증 기록이 없어요
+        <AppText variant="label" color="textMuted" style={styles.regular}>
+          {t('onboarding.ready.noHistory')}
         </AppText>
       </View>
     </Screen>
@@ -53,5 +61,5 @@ const styles = StyleSheet.create({
   cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   pill: { borderRadius: Radius.pill, paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs },
   count: { fontSize: 56, lineHeight: 64, fontVariant: ['tabular-nums'] },
-  note: { fontWeight: '400' },
+  regular: { fontWeight: '400' },
 });

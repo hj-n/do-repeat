@@ -1,0 +1,131 @@
+/**
+ * English copy. This file defines every text key in the app;
+ * ko.ts must have exactly the same keys (the type check enforces it).
+ */
+const en = {
+  common: {
+    next: 'Next',
+    start: 'Start',
+    back: 'Back',
+    retry: 'Try again',
+    backHome: 'Back to home',
+    openSettings: 'Open settings',
+  },
+  presets: {
+    exercise: 'Exercise',
+    reading: 'Reading',
+    study: 'Study',
+    water: 'Drink water',
+    walk: 'Walk',
+    meditate: 'Meditate',
+    journal: 'Journal',
+  },
+  method: {
+    location: 'Location',
+    photo: 'Photo',
+  },
+  onboarding: {
+    what: {
+      eyebrow: 'DO REPEAT',
+      title: 'What do you repeat?',
+      subtitle: 'Pick one thing you want to do every day.',
+      custom: 'Custom',
+      customPlaceholder: 'e.g. Practice guitar for 10 minutes',
+    },
+    method: {
+      title: 'How will you check in?',
+      subtitle: 'Choose how you’ll prove “{{habit}}” each day.',
+      locationTitle: 'Location check-in',
+      locationDescription: 'Open the app at your spot and tap check in.',
+      photoTitle: 'Photo check-in',
+      photoDescription: 'Take a photo on the spot to check in.',
+    },
+    place: {
+      title: 'Where will you check in?',
+      subtitle: 'Go to the place where you do it, then save it as your spot.',
+      nameLabel: 'Place name',
+      namePlaceholder: 'e.g. Neighborhood gym',
+      useCurrent: 'Use my current location',
+      locating: 'Finding your location…',
+      saved: 'Location saved · accuracy ±{{accuracy}}m',
+      relocate: 'Update location',
+      radiusNote: 'Check-ins count within {{radius}}m of this spot.',
+      defaultName: 'My spot',
+    },
+    ready: {
+      title: 'You’re all set',
+      subtitle: 'Check in today to start at D+1.',
+      noHistory: 'No check-ins yet',
+    },
+  },
+  home: {
+    title: 'My repeats',
+    settings: 'Settings',
+    atPlace: 'at {{place}}',
+    best_one: 'Best {{count}} day',
+    best_other: 'Best {{count}} days',
+    total_one: 'Total {{count}} day',
+    total_other: 'Total {{count}} days',
+    statusPending: 'Not checked in yet today',
+    statusNew: 'Check in today to start at D+1',
+    statusBroken: 'Your streak reset. Start again today.',
+    checkIn: 'Check in today',
+    checkedIn: 'Checked in today',
+    addHabit: 'Add another repeat',
+  },
+  checkIn: {
+    locationTitle: 'Location check-in',
+    photoTitle: 'Photo check-in',
+    checking: 'Checking your location…',
+    tooFarTitle: 'You’re not at your spot',
+    tooFar: 'You’re {{distance}} away from {{place}}.',
+    tooFarHint: 'You can check in within {{radius}}m.',
+    deniedTitle: 'Location access is off',
+    denied: 'Allow location access so the app can confirm you’re at your spot.',
+    mockedTitle: 'Fake location detected',
+    mocked: 'Turn off any fake GPS app and try again.',
+    unavailableTitle: 'Couldn’t find your location',
+    unavailable: 'Move to a spot with better signal and try again.',
+    photoHint: 'Take it right where you are.',
+    takePhoto: 'Take a photo',
+    choosePhoto: 'Choose a photo',
+    retake: 'Retake',
+    usePhoto: 'Check in with this photo',
+    cameraDeniedTitle: 'Camera access is off',
+    cameraDenied: 'Allow camera access to check in with a photo.',
+    photoError: 'Couldn’t open the camera. Try again.',
+  },
+  success: {
+    title: 'Verified!',
+    alreadyTitle: 'Already checked in today',
+    streak: '{{count}}-day streak',
+  },
+  settings: {
+    title: 'Settings',
+    language: 'Language',
+    languageSystem: 'Device language',
+    languageSystemCurrent: 'Device language ({{language}})',
+    devTools: 'Developer tools',
+    previewLocation: 'Preview location',
+    previewInside: 'At the spot',
+    previewOutside: 'Away',
+    previewNote: 'The preview can’t use real GPS, so it pretends you’re here.',
+    fillSample: 'Fill sample history (last {{count}} days)',
+    fillSampleDone: 'Added the last {{count}} days.',
+    reset: 'Delete all data',
+    resetConfirm: 'Delete every repeat and check-in?',
+    resetYes: 'Delete',
+    resetNo: 'Keep',
+    version: 'Do Repeat {{version}}',
+  },
+  language: {
+    en: 'English',
+    ko: '한국어',
+  },
+} as const;
+
+export default en;
+
+type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
+/** Shape every translation file must match. */
+export type Translation = Widen<typeof en>;

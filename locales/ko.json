@@ -1,0 +1,10 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Do Repeat",
+    "NSLocationWhenInUseUsageDescription": "인증할 때 등록한 장소에 있는지 확인하기 위해 위치를 사용해요.",
+    "NSCameraUsageDescription": "인증 사진을 찍기 위해 카메라를 사용해요."
+  },
+  "android": {
+    "app_name": "Do Repeat"
+  }
+}

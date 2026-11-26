@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
@@ -8,61 +9,48 @@ import { OptionCard } from '@/components/option-card';
 import { Screen } from '@/components/screen';
 import { StepHeader } from '@/components/step-header';
 import { Spacing } from '@/constants/theme';
-import { withObjectParticle } from '@/lib/korean';
-
-export type VerifyMethod = 'location' | 'photo';
-
-const METHODS: { id: VerifyMethod; badge: string; title: string; description: string }[] = [
-  {
-    id: 'location',
-    badge: '위치',
-    title: '위치 인증',
-    description: '정해둔 장소에서 앱을 열고 인증 버튼만 누르면 돼요.',
-  },
-  {
-    id: 'photo',
-    badge: '사진',
-    title: '사진 인증',
-    description: '그 자리에서 사진을 찍어 올리면 인증돼요.',
-  },
-];
+import { habitTitle, isPresetId, type VerifyMethod } from '@/lib/habits';
 
 /** 온보딩 2단계: 인증 방법 고르기 */
 export default function VerifyMethodScreen() {
-  const { habit = '운동' } = useLocalSearchParams<{ habit?: string }>();
+  const { t } = useTranslation();
+  const { preset, custom } = useLocalSearchParams<{ preset?: string; custom?: string }>();
   const [method, setMethod] = useState<VerifyMethod | null>(null);
+  const name = habitTitle({ preset: isPresetId(preset) ? preset : undefined, customTitle: custom }, t);
+
+  const next = () => {
+    if (!method) return;
+    const params = { ...(preset ? { preset } : {}), ...(custom ? { custom } : {}) };
+    router.push({
+      pathname: method === 'location' ? '/onboarding/place' : '/onboarding/ready',
+      params,
+    });
+  };
 
   return (
-    <Screen
-      footer={
-        <Button
-          label="다음"
-          disabled={!method}
-          onPress={() =>
-            method && router.push({ pathname: '/onboarding/ready', params: { habit, method } })
-          }
-        />
-      }>
+    <Screen footer={<Button label={t('common.next')} disabled={!method} onPress={next} />}>
       <StepHeader step={2} total={3} />
 
       <View style={styles.heading}>
-        <AppText variant="title">어떻게 인증할까요?</AppText>
-        <AppText color="textMuted">
-          {withObjectParticle(habit)} 했다는 걸 어떻게 보여줄지 정해주세요.
-        </AppText>
+        <AppText variant="title">{t('onboarding.method.title')}</AppText>
+        <AppText color="textMuted">{t('onboarding.method.subtitle', { habit: name })}</AppText>
       </View>
 
       <View style={styles.options}>
-        {METHODS.map((m) => (
-          <OptionCard
-            key={m.id}
-            badge={m.badge}
-            title={m.title}
-            description={m.description}
-            selected={method === m.id}
-            onPress={() => setMethod(m.id)}
-          />
-        ))}
+        <OptionCard
+          badge={t('method.location')}
+          title={t('onboarding.method.locationTitle')}
+          description={t('onboarding.method.locationDescription')}
+          selected={method === 'location'}
+          onPress={() => setMethod('location')}
+        />
+        <OptionCard
+          badge={t('method.photo')}
+          title={t('onboarding.method.photoTitle')}
+          description={t('onboarding.method.photoDescription')}
+          selected={method === 'photo'}
+          onPress={() => setMethod('photo')}
+        />
       </View>
     </Screen>
   );

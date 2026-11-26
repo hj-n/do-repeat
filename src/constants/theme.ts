@@ -22,6 +22,9 @@ export const Colors = {
     onAccent: '#FFFFFF',
     /** 선택된 카드의 옅은 바탕 */
     accentSoft: '#E4E8FB',
+    /** 오류, 실패 안내 */
+    danger: '#C93A40',
+    dangerSoft: '#FBE7E8',
   },
   dark: {
     background: '#0F1115',
@@ -33,6 +36,8 @@ export const Colors = {
     accent: '#8496FF',
     onAccent: '#0F1115',
     accentSoft: '#212849',
+    danger: '#FF7B81',
+    dangerSoft: '#3A1E21',
   },
 } as const;
 
