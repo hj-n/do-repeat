@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
@@ -16,7 +16,7 @@ export default function HomeScreen() {
   const habits = useAppStore((s) => s.habits);
 
   return (
-    <Screen>
+    <Screen edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <View style={styles.headerText}>
           <AppText variant="label" color="textMuted">
@@ -24,15 +24,6 @@ export default function HomeScreen() {
           </AppText>
           <AppText variant="display">{t('home.title')}</AppText>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={() => router.push('/settings')}
-          style={styles.settings}>
-          <AppText variant="label" color="textMuted">
-            {t('home.settings')}
-          </AppText>
-        </Pressable>
       </View>
 
       <View style={styles.list}>
@@ -49,6 +40,5 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'flex-start', paddingTop: Spacing.sm },
   headerText: { flex: 1, gap: Spacing.xs },
-  settings: { paddingVertical: Spacing.xs, paddingLeft: Spacing.md },
   list: { gap: Spacing.lg },
 });

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -9,13 +9,15 @@ type ScreenProps = {
   children: ReactNode;
   /** 화면 아래에 고정되는 영역 (주로 "다음" 버튼) */
   footer?: ReactNode;
+  /** 안전 영역을 적용할 가장자리 (탭 화면은 아래를 탭 막대가 처리) */
+  edges?: Edge[];
 };
 
 /** 모든 화면의 바탕: 안전 영역, 좌우 여백, 아래 고정 버튼 자리를 잡아줍니다. */
-export function Screen({ children, footer }: ScreenProps) {
+export function Screen({ children, footer, edges }: ScreenProps) {
   const theme = useTheme();
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
+    <SafeAreaView edges={edges} style={[styles.root, { backgroundColor: theme.background }]}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"

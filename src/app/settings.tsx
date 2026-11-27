@@ -2,21 +2,23 @@ import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
+import { Segmented } from '@/components/segmented';
 import { Screen } from '@/components/screen';
 import { TopBar } from '@/components/top-bar';
 import { Radius, Spacing } from '@/constants/theme';
+import { SAMPLE_FOLLOWER_IDS } from '@/data/sample-people';
 import { PreviewPositionControl } from '@/features/check-in/preview-position-control';
 import { useTheme } from '@/hooks/use-theme';
 import { deviceLanguage, type LanguageSetting } from '@/i18n';
-import { useAppStore } from '@/store/app-store';
+import { useAppStore, type Visibility } from '@/store/app-store';
 
 const SAMPLE_DAYS = 12;
 
-/** 설정: 언어, 개발용 도구 */
+/** 설정: 공개 범위, 언어, 개발용 도구 */
 export default function SettingsScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -25,6 +27,16 @@ export default function SettingsScreen() {
   const fillSampleHistory = useAppStore((s) => s.fillSampleHistory);
   const resetAll = useAppStore((s) => s.resetAll);
   const hasHabits = useAppStore((s) => s.habits.length > 0);
+  const profile = useAppStore((s) => s.profile);
+  const updateProfile = useAppStore((s) => s.updateProfile);
+  const hasIncoming = useAppStore((s) => s.social.incoming.length > 0);
+  const hasOutgoing = useAppStore((s) => s.social.outgoing.length > 0);
+  const acceptOutgoingRequests = useAppStore((s) => s.acceptOutgoingRequests);
+  const receiveSampleFollows = useAppStore((s) => s.receiveSampleFollows);
+  const visibilityOptions: { value: Visibility; label: string }[] = [
+    { value: 'public', label: t('profile.public') },
+    { value: 'private', label: t('profile.private') },
+  ];
   const [filled, setFilled] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
@@ -39,7 +51,54 @@ export default function SettingsScreen() {
 
   return (
     <Screen>
-      <TopBar title={t('settings.title')} />
+      <TopBar title={t('settings.title')} fallback="/profile" />
+
+      <View style={styles.section}>
+        <AppText variant="label" color="textMuted">
+          {t('settings.privacy')}
+        </AppText>
+        <View style={[styles.group, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+          <View style={styles.row}>
+            <View style={styles.rowLabel}>
+              <AppText>{t('settings.privateAccount')}</AppText>
+              <AppText variant="caption" color="textMuted">
+                {profile.isPrivate ? t('settings.privateAccountNote') : t('settings.publicAccountNote')}
+              </AppText>
+              {profile.isPrivate && hasIncoming ? (
+                <AppText variant="caption" color="accent">
+                  {t('settings.publicAcceptsRequests')}
+                </AppText>
+              ) : null}
+            </View>
+            <Switch
+              accessibilityLabel={t('settings.privateAccount')}
+              value={profile.isPrivate}
+              onValueChange={(isPrivate) => updateProfile({ isPrivate })}
+              trackColor={{ false: theme.surfaceMuted, true: theme.accent }}
+              thumbColor={theme.surface}
+            />
+          </View>
+          {(
+            [
+              ['checkInVisibility', t('settings.checkInPosts')],
+              ['milestoneVisibility', t('settings.milestonePosts')],
+            ] as const
+          ).map(([key, label]) => (
+            <View key={key} style={[styles.row, { borderTopWidth: 1, borderTopColor: theme.border }]}>
+              <AppText style={styles.rowLabel}>{label}</AppText>
+              <Segmented<Visibility>
+                accessibilityLabel={label}
+                value={profile[key]}
+                onChange={(value) => updateProfile({ [key]: value })}
+                options={visibilityOptions}
+              />
+            </View>
+          ))}
+        </View>
+        <AppText variant="caption" color="textMuted">
+          {t('settings.postPrivateNote')}
+        </AppText>
+      </View>
 
       <View style={styles.section}>
         <AppText variant="label" color="textMuted">
@@ -82,6 +141,17 @@ export default function SettingsScreen() {
               fillSampleHistory(SAMPLE_DAYS);
               setFilled(true);
             }}
+          />
+          <Button
+            kind="secondary"
+            label={t('settings.receiveFollows')}
+            onPress={() => receiveSampleFollows(SAMPLE_FOLLOWER_IDS)}
+          />
+          <Button
+            kind="secondary"
+            label={t('settings.acceptOutgoing')}
+            disabled={!hasOutgoing}
+            onPress={acceptOutgoingRequests}
           />
           {filled ? (
             <AppText variant="label" color="accent">
