@@ -11,8 +11,10 @@ import { timeAgo } from '@/lib/dates';
 import { habitTitle } from '@/lib/habits';
 import type { CheckInPost, MilestonePost, Post } from '@/lib/posts';
 
-/** 피드 게시물 한 개: 인증 카드 또는 달성 카드 */
-export function PostCard({ post }: { post: Post }) {
+import { useComments, useLike } from './use-reactions';
+
+/** 피드 게시물 한 개: 인증 카드 또는 달성 카드, 아래에 좋아요·댓글 */
+export function PostCard({ post, linkComments = true }: { post: Post; linkComments?: boolean }) {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
   const openAuthor = () =>
@@ -43,6 +45,44 @@ export function PostCard({ post }: { post: Post }) {
       </Pressable>
 
       {post.kind === 'checkIn' ? <CheckInBody post={post} /> : <MilestoneBody post={post} />}
+
+      <Reactions postId={post.id} linkComments={linkComments} />
+    </View>
+  );
+}
+
+/** 좋아요 / 댓글 버튼 */
+function Reactions({ postId, linkComments }: { postId: string; linkComments: boolean }) {
+  const { t } = useTranslation();
+  const like = useLike(postId);
+  const commentCount = useComments(postId).length;
+
+  return (
+    <View style={styles.reactions}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ selected: like.liked }}
+        accessibilityLabel={`${t('post.like')}, ${t('post.likes', { count: like.count })}`}
+        hitSlop={8}
+        onPress={like.toggle}
+        style={styles.reaction}>
+        <Icon name={like.liked ? 'heart-filled' : 'heart'} size={22} color={like.liked ? 'danger' : 'textMuted'} />
+        <AppText variant="label" color={like.liked ? 'danger' : 'textMuted'} style={styles.count}>
+          {like.count > 0 ? like.count : t('post.like')}
+        </AppText>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('post.comments', { count: commentCount })}
+        hitSlop={8}
+        disabled={!linkComments}
+        onPress={() => router.push({ pathname: '/post/[id]', params: { id: postId } })}
+        style={styles.reaction}>
+        <Icon name="comment" size={22} color="textMuted" />
+        <AppText variant="label" color="textMuted" style={styles.count}>
+          {commentCount > 0 ? commentCount : t('post.comment')}
+        </AppText>
+      </Pressable>
     </View>
   );
 }
@@ -84,6 +124,7 @@ function CheckInBody({ post }: { post: CheckInPost }) {
             : t('feed.photoCheckIn')}
         </AppText>
       </View>
+      {post.note ? <AppText style={styles.note}>{post.note}</AppText> : null}
     </View>
   );
 }
@@ -146,5 +187,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.xs,
   },
+  note: { marginTop: -Spacing.xs },
+  reactions: { flexDirection: 'row', gap: Spacing.xl, paddingTop: Spacing.xs },
+  reaction: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 32 },
+  count: { fontVariant: ['tabular-nums'] },
   milestoneNumber: { fontSize: 64, lineHeight: 70, fontWeight: '800', fontVariant: ['tabular-nums'] },
 });

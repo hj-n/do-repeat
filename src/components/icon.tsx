@@ -15,6 +15,9 @@ export type IconName =
   | 'plus'
   | 'search'
   | 'flag'
+  | 'heart'
+  | 'heart-filled'
+  | 'comment'
   | 'chevron-left';
 
 type IconProps = { name: IconName; size?: number; color?: ThemeColor; strokeWidth?: number };
@@ -81,6 +84,16 @@ export function Icon({ name, size = 24, color = 'text', strokeWidth = 1.8 }: Ico
         </>
       ) : null}
       {name === 'flag' ? <Path d="M5.5 21V4h11l-2 4 2 4h-11" {...common} /> : null}
+      {name === 'heart' || name === 'heart-filled' ? (
+        <Path
+          d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"
+          {...common}
+          fill={name === 'heart-filled' ? stroke : 'none'}
+        />
+      ) : null}
+      {name === 'comment' ? (
+        <Path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V16.5H5A1.5 1.5 0 0 1 3.5 15V7A1.5 1.5 0 0 1 5 5.5z" {...common} />
+      ) : null}
       {name === 'chevron-left' ? <Path d="m15 5-7 7 7 7" {...common} /> : null}
     </Svg>
   );

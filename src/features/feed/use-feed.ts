@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { canSeeAccount, samplePosts, SAMPLE_PEOPLE, type Person } from '@/data/sample-people';
+import { canSeeAccount, findPerson, samplePosts, SAMPLE_PEOPLE, type Person } from '@/data/sample-people';
 import { myPosts, sortPosts, type Post, type PostAuthor } from '@/lib/posts';
 import { useAppStore } from '@/store/app-store';
 
@@ -61,4 +61,18 @@ export function useExploreFeed(): Post[] {
     () => sortPosts(SAMPLE_PEOPLE.filter((p) => !p.isPrivate).flatMap((p) => visiblePostsOf(p, false))),
     [],
   );
+}
+
+/** id로 게시물 찾기 (내가 볼 수 없는 게시물이면 undefined) */
+export function usePost(id: string | undefined): Post | undefined {
+  const mine = useMyPosts();
+  const following = useAppStore((s) => s.social.following);
+  return useMemo(() => {
+    if (!id) return undefined;
+    const own = mine.find((p) => p.id === id);
+    if (own) return own;
+    const author = findPerson(samplePosts().find((p) => p.id === id)?.author.id);
+    if (!author) return undefined;
+    return visiblePostsOf(author, following.includes(author.id)).find((p) => p.id === id);
+  }, [id, mine, following]);
 }

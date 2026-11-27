@@ -34,6 +34,8 @@ export type CheckInPost = PostBase & {
   method: VerifyMethod;
   placeName?: string;
   photo?: ImageSourcePropType;
+  /** 인증과 함께 남긴 한마디 */
+  note?: string;
 };
 
 export type MilestonePost = PostBase & { kind: 'milestone' };
@@ -46,7 +48,7 @@ export function isMilestone(days: number): boolean {
 }
 
 type MyHabit = HabitRef & { id: string; method: VerifyMethod; place?: { name: string } };
-type MyCheckIn = { id: string; habitId: string; day: DateKey; at: string; photoUri?: string };
+type MyCheckIn = { id: string; habitId: string; day: DateKey; at: string; photoUri?: string; note?: string };
 
 /** Builds my posts from my check-ins: one per check-in, plus milestones. */
 export function myPosts(
@@ -75,6 +77,7 @@ export function myPosts(
         method: habit.method,
         placeName: habit.place?.name,
         photo: c.photoUri ? { uri: c.photoUri } : undefined,
+        note: c.note,
       });
       if (isMilestone(run)) {
         posts.push({

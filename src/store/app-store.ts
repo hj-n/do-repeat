@@ -36,7 +36,17 @@ export type CheckIn = {
   photoUri?: string;
   /** Meters from the saved spot, for location check-ins */
   distance?: number;
+  /** 인증과 함께 남긴 한마디 (100자 이내) */
+  note?: string;
 };
+
+/** 한마디 최대 글자 수 */
+export const NOTE_MAX = 100;
+/** 댓글 최대 글자 수 */
+export const COMMENT_MAX = 200;
+
+/** 게시물에 단 댓글. authorId가 'me'면 내 댓글 */
+export type Comment = { id: string; postId: string; authorId: string; text: string; at: string };
 
 export type { Visibility };
 
@@ -72,9 +82,21 @@ type AppState = {
   language: LanguageSetting;
   profile: MyProfile;
   social: Social;
+  /** 내가 쓴 댓글 (예시 사용자의 댓글은 data/sample-people.ts에 있어요) */
+  comments: Comment[];
+  /** 내가 좋아요한 게시물 id */
+  likes: string[];
   addHabit: (input: Omit<Habit, 'id' | 'createdAt'>) => Habit;
-  /** Records today's check-in. Returns false if today was already done. */
-  checkIn: (habitId: string, details?: { photoUri?: string; distance?: number }) => boolean;
+  /** Records today's check-in. Returns null if today was already done. */
+  checkIn: (
+    habitId: string,
+    details?: { photoUri?: string; distance?: number; note?: string },
+  ) => CheckIn | null;
+  /** 인증에 한마디를 붙이거나 고칩니다 (빈 글이면 지움) */
+  setCheckInNote: (checkInId: string, note: string) => void;
+  addComment: (postId: string, text: string) => void;
+  deleteComment: (commentId: string) => void;
+  toggleLike: (postId: string) => void;
   setLanguage: (language: LanguageSetting) => void;
   /** 공개로 바꾸면 대기 중인 요청은 모두 수락됩니다 */
   updateProfile: (patch: Partial<MyProfile>) => void;
@@ -112,6 +134,8 @@ export const useAppStore = create<AppState>()(
         milestoneVisibility: 'public',
       },
       social: { following: [], outgoing: [], followers: [], incoming: [] },
+      comments: [],
+      likes: [],
 
       addHabit: (input) => {
         const habit: Habit = { ...input, id: newId(), createdAt: new Date().toISOString() };
@@ -121,17 +145,39 @@ export const useAppStore = create<AppState>()(
 
       checkIn: (habitId, details) => {
         const today = toDateKey();
-        if (get().checkIns.some((c) => c.habitId === habitId && c.day === today)) return false;
+        if (get().checkIns.some((c) => c.habitId === habitId && c.day === today)) return null;
+        const note = details?.note?.trim().slice(0, NOTE_MAX);
         const entry: CheckIn = {
           id: newId(),
           habitId,
           day: today,
           at: new Date().toISOString(),
           ...details,
+          note: note || undefined,
         };
         set((s) => ({ checkIns: [...s.checkIns, entry] }));
-        return true;
+        return entry;
       },
+
+      setCheckInNote: (checkInId, note) => {
+        const clean = note.trim().slice(0, NOTE_MAX);
+        set((s) => ({
+          checkIns: s.checkIns.map((c) => (c.id === checkInId ? { ...c, note: clean || undefined } : c)),
+        }));
+      },
+
+      addComment: (postId, text) => {
+        const clean = text.trim().slice(0, COMMENT_MAX);
+        if (!clean) return;
+        const comment: Comment = { id: newId(), postId, authorId: 'me', text: clean, at: new Date().toISOString() };
+        set((s) => ({ comments: [...s.comments, comment] }));
+      },
+
+      deleteComment: (commentId) =>
+        set((s) => ({ comments: s.comments.filter((c) => c.id !== commentId) })),
+
+      toggleLike: (postId) =>
+        set((s) => ({ likes: s.likes.includes(postId) ? without(s.likes, postId) : [...s.likes, postId] })),
 
       setLanguage: (language) => set({ language }),
 
@@ -210,7 +256,13 @@ export const useAppStore = create<AppState>()(
       },
 
       resetAll: () =>
-        set({ habits: [], checkIns: [], social: { following: [], outgoing: [], followers: [], incoming: [] } }),
+        set({
+          habits: [],
+          checkIns: [],
+          comments: [],
+          likes: [],
+          social: { following: [], outgoing: [], followers: [], incoming: [] },
+        }),
     }),
     {
       name: 'do-repeat',
@@ -221,6 +273,8 @@ export const useAppStore = create<AppState>()(
         language: s.language,
         profile: s.profile,
         social: s.social,
+        comments: s.comments,
+        likes: s.likes,
         // Web photos are temporary blob/data URLs; don't fill browser storage with them.
         checkIns: s.checkIns.map(({ photoUri, ...rest }) =>
           photoUri && !/^(blob|data):/.test(photoUri) ? { ...rest, photoUri } : rest,

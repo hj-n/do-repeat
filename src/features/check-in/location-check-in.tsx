@@ -18,7 +18,7 @@ import { SuccessView } from './success-view';
 
 type Phase =
   | { kind: 'checking' }
-  | { kind: 'success'; streak: number }
+  | { kind: 'success'; streak: number; checkInId?: string }
   | { kind: 'tooFar'; distance: number }
   | { kind: 'denied' }
   | { kind: 'mocked' }
@@ -49,12 +49,12 @@ export function LocationCheckIn({ habit }: { habit: Habit }) {
     if (!isWithinPlace(distance, place.radius, result.accuracy)) {
       return { kind: 'tooFar', distance };
     }
-    checkIn(habit.id, { distance: Math.round(distance) });
+    const entry = checkIn(habit.id, { distance: Math.round(distance) });
     const days = useAppStore
       .getState()
       .checkIns.filter((c) => c.habitId === habit.id)
       .map((c) => c.day);
-    return { kind: 'success', streak: summarizeStreak(days).current };
+    return { kind: 'success', streak: summarizeStreak(days).current, checkInId: entry?.id };
   }, [checkIn, habit.id, place]);
 
   // 화면을 열면 바로 위치 확인
@@ -76,7 +76,7 @@ export function LocationCheckIn({ habit }: { habit: Habit }) {
     return <SuccessView habitName={habitTitle(habit, t)} streak={streak.current} already />;
   }
   if (phase.kind === 'success') {
-    return <SuccessView habitName={habitTitle(habit, t)} streak={phase.streak} />;
+    return <SuccessView habitName={habitTitle(habit, t)} streak={phase.streak} checkInId={phase.checkInId} />;
   }
 
   return (

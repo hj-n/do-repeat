@@ -5,8 +5,10 @@ import { AccessibilityInfo, Animated, Image, StyleSheet, View } from 'react-nati
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
+import { NoteField } from '@/components/note-field';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { NOTE_MAX, useAppStore } from '@/store/app-store';
 
 type SuccessViewProps = {
   habitName: string;
@@ -14,10 +16,12 @@ type SuccessViewProps = {
   /** true면 "오늘은 이미 인증했어요" */
   already?: boolean;
   photoUri?: string;
+  /** 방금 만든 인증 id. 있으면 한마디를 남기거나 고칠 수 있어요 */
+  checkInId?: string;
 };
 
 /** 인증 성공: D+N 도장이 찍히는 화면 */
-export function SuccessView({ habitName, streak, already, photoUri }: SuccessViewProps) {
+export function SuccessView({ habitName, streak, already, photoUri, checkInId }: SuccessViewProps) {
   const theme = useTheme();
   const { t } = useTranslation();
   const [scale] = useState(() => new Animated.Value(already ? 1 : 1.6));
@@ -73,6 +77,8 @@ export function SuccessView({ habitName, streak, already, photoUri }: SuccessVie
         <Image source={{ uri: photoUri }} style={styles.photo} accessibilityIgnoresInvertColors />
       ) : null}
 
+      {checkInId ? <NoteEditor checkInId={checkInId} /> : null}
+
       <View style={styles.button}>
         <Button label={t('common.backHome')} onPress={() => router.dismissTo('/home')} />
       </View>
@@ -96,4 +102,49 @@ const styles = StyleSheet.create({
   center: { textAlign: 'center' },
   photo: { width: 120, height: 160, borderRadius: Radius.md },
   button: { alignSelf: 'stretch' },
+  note: { alignSelf: 'stretch', borderWidth: 1, borderRadius: Radius.lg, padding: Spacing.lg, gap: Spacing.sm },
+  noteForm: { alignSelf: 'stretch', gap: Spacing.sm },
 });
+
+/** 인증 게시물에 한마디 남기기 / 고치기 */
+function NoteEditor({ checkInId }: { checkInId: string }) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const saved = useAppStore((s) => s.checkIns.find((c) => c.id === checkInId)?.note);
+  const setCheckInNote = useAppStore((s) => s.setCheckInNote);
+  const [editing, setEditing] = useState(!saved);
+  const [draft, setDraft] = useState(saved ?? '');
+
+  if (!editing && saved) {
+    return (
+      <View style={[styles.note, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+        <AppText variant="caption" color="accent">
+          {t('note.saved')}
+        </AppText>
+        <AppText>{saved}</AppText>
+        <Button kind="secondary" size="small" label={t('note.edit')} onPress={() => setEditing(true)} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.noteForm}>
+      <NoteField
+        label={t('note.label')}
+        value={draft}
+        onChangeText={setDraft}
+        placeholder={t('note.placeholder')}
+        max={NOTE_MAX}
+      />
+      <Button
+        kind="secondary"
+        label={t('note.save')}
+        disabled={draft.trim().length === 0}
+        onPress={() => {
+          setCheckInNote(checkInId, draft);
+          setEditing(false);
+        }}
+      />
+    </View>
+  );
+}

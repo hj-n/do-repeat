@@ -4,12 +4,13 @@ import { Image, Linking, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
+import { NoteField } from '@/components/note-field';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { habitTitle } from '@/lib/habits';
 import { takeCheckInPhoto, usesFilePicker } from '@/lib/photo';
 import { summarizeStreak } from '@/lib/streak';
-import { useAppStore, useStreak, type Habit } from '@/store/app-store';
+import { NOTE_MAX, useAppStore, useStreak, type Habit } from '@/store/app-store';
 
 import { Notice } from './notice';
 import { SuccessView } from './success-view';
@@ -24,7 +25,8 @@ export function PhotoCheckIn({ habit }: { habit: Habit }) {
   const [alreadyDone] = useState(streak.doneToday);
   const [photo, setPhoto] = useState<string | null>(null);
   const [problem, setProblem] = useState<'denied' | 'error' | null>(null);
-  const [done, setDone] = useState<number | null>(null);
+  const [note, setNote] = useState('');
+  const [done, setDone] = useState<{ streak: number; checkInId?: string } | null>(null);
 
   const shoot = async () => {
     const result = await takeCheckInPhoto();
@@ -38,19 +40,26 @@ export function PhotoCheckIn({ habit }: { habit: Habit }) {
 
   const submit = () => {
     if (!photo) return;
-    checkIn(habit.id, { photoUri: photo });
+    const entry = checkIn(habit.id, { photoUri: photo, note });
     const days = useAppStore
       .getState()
       .checkIns.filter((c) => c.habitId === habit.id)
       .map((c) => c.day);
-    setDone(summarizeStreak(days).current);
+    setDone({ streak: summarizeStreak(days).current, checkInId: entry?.id });
   };
 
   if (alreadyDone) {
     return <SuccessView habitName={habitTitle(habit, t)} streak={streak.current} already />;
   }
   if (done !== null) {
-    return <SuccessView habitName={habitTitle(habit, t)} streak={done} photoUri={photo ?? undefined} />;
+    return (
+      <SuccessView
+        habitName={habitTitle(habit, t)}
+        streak={done.streak}
+        photoUri={photo ?? undefined}
+        checkInId={done.checkInId}
+      />
+    );
   }
 
   return (
@@ -78,6 +87,16 @@ export function PhotoCheckIn({ habit }: { habit: Habit }) {
       ) : null}
       {problem === 'error' ? (
         <Notice title={t('checkIn.photoTitle')} body={t('checkIn.photoError')} />
+      ) : null}
+
+      {photo ? (
+        <NoteField
+          label={t('note.label')}
+          value={note}
+          onChangeText={setNote}
+          placeholder={t('note.placeholder')}
+          max={NOTE_MAX}
+        />
       ) : null}
 
       <View style={styles.actions}>
