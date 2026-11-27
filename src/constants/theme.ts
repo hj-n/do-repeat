@@ -1,8 +1,9 @@
 /**
- * Do Repeat 디자인 토큰
+ * 색 값의 JS 사본.
  *
- * 색, 글자 크기, 간격, 모서리 둥글기를 여기 한 곳에서 관리합니다.
- * 디자인을 바꾸고 싶으면 이 파일의 값만 바꾸면 앱 전체에 반영돼요.
+ * 화면의 색은 src/global.css의 CSS 변수(shadcn 방식: bg-primary, text-muted-foreground 등)가 기준이에요.
+ * 여기 값은 className을 못 쓰는 곳(탭 막대, 내비게이션 테마, 움직이는 도장)에서만 씁니다.
+ * global.css를 바꾸면 여기도 같은 값으로 맞춰 주세요.
  */
 
 /**
@@ -11,7 +12,7 @@
  * - 바탕·글자·구분선: iOS 시스템 회색 단계 (systemBackground, Gray 2~6, separator)
  * - 대표 색: 처음 정한 파란색 (라이트 #2F49D1 / 다크 #8496FF)
  * - 빨강: 오류와 좋아요에만, 덜 튀는 값
- * 대표 색을 바꾸려면 accent / onAccent / accentSoft 세 값만 바꾸면 돼요.
+ * 대표 색을 바꾸려면 global.css의 --color-primary와 여기 accent / onAccent / accentSoft를 함께 바꿔요.
  */
 export const Colors = {
   light: {
@@ -57,35 +58,3 @@ export const Colors = {
 
 export type ThemeColors = { [K in keyof typeof Colors.light]: string };
 export type ThemeColor = keyof ThemeColors;
-
-/** 글자 스타일 단계 (크기 / 줄 높이 / 굵기) */
-export const Type = {
-  display: { fontSize: 34, lineHeight: 40, fontWeight: '800' },
-  title: { fontSize: 24, lineHeight: 30, fontWeight: '700' },
-  body: { fontSize: 16, lineHeight: 24, fontWeight: '400' },
-  bodyStrong: { fontSize: 16, lineHeight: 24, fontWeight: '600' },
-  label: { fontSize: 14, lineHeight: 20, fontWeight: '600' },
-  caption: { fontSize: 12, lineHeight: 16, fontWeight: '500' },
-} as const;
-
-export type TypeVariant = keyof typeof Type;
-
-/** 간격 (4의 배수) */
-export const Spacing = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-  xxl: 32,
-} as const;
-
-export const Radius = {
-  sm: 8,
-  md: 14,
-  lg: 20,
-  pill: 999,
-} as const;
-
-/** 태블릿이나 웹에서 화면이 너무 넓어지지 않게 하는 최대 폭 */
-export const MaxContentWidth = 480;

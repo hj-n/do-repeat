@@ -1,20 +1,20 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
-import { Icon } from '@/components/icon';
 import { Screen } from '@/components/screen';
 import { StepHeader } from '@/components/step-header';
-import { TextField } from '@/components/text-field';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 import { Notice } from '@/features/check-in/notice';
 import { finishOnboarding } from '@/features/onboarding/finish';
-import { useTheme } from '@/hooks/use-theme';
 import type { Coordinates } from '@/lib/geo';
 import { DEFAULT_RADIUS, isPresetId } from '@/lib/habits';
+import { MapPin } from '@/lib/icons';
 import { getCurrentPosition, isSimulatedLocation } from '@/lib/location';
 import { useAppStore } from '@/store/app-store';
 
@@ -22,7 +22,6 @@ type Spot = { coords: Coordinates; accuracy: number | null };
 
 /** 온보딩 3단계 (위치 인증): 지금 있는 곳을 내 장소로 저장 */
 export default function PlaceScreen() {
-  const theme = useTheme();
   const { t } = useTranslation();
   const { preset, custom } = useLocalSearchParams<{ preset?: string; custom?: string }>();
   const addHabit = useAppStore((s) => s.addHabit);
@@ -46,67 +45,67 @@ export default function PlaceScreen() {
       preset: isPresetId(preset) ? preset : undefined,
       customTitle: custom,
       method: 'location',
-      place: {
-        name: name.trim() || t('onboarding.place.defaultName'),
-        ...spot.coords,
-        radius: DEFAULT_RADIUS,
-      },
+      place: { name: name.trim() || t('onboarding.place.defaultName'), ...spot.coords, radius: DEFAULT_RADIUS },
     });
     finishOnboarding();
   };
 
+  const radiusNote = t('onboarding.place.radiusNote', { radius: DEFAULT_RADIUS });
+
   return (
-    <Screen footer={<Button label={t('common.start')} disabled={!spot} onPress={start} />}>
+    <Screen
+      footer={
+        <Button size="lg" disabled={!spot} onPress={start}>
+          <Text>{t('common.start')}</Text>
+        </Button>
+      }>
       <StepHeader step={3} total={3} />
 
-      <View style={styles.heading}>
-        <AppText variant="title">{t('onboarding.place.title')}</AppText>
-        <AppText color="textMuted">{t('onboarding.place.subtitle')}</AppText>
+      <View className="gap-2 pt-4">
+        <Text className="text-2xl font-bold tracking-tight">{t('onboarding.place.title')}</Text>
+        <Text className="text-muted-foreground">{t('onboarding.place.subtitle')}</Text>
       </View>
 
-      <TextField
-        label={t('onboarding.place.nameLabel')}
-        value={name}
-        onChangeText={setName}
-        placeholder={t('onboarding.place.namePlaceholder')}
-        maxLength={24}
-      />
+      <View className="gap-2">
+        <Label nativeID="place-name">{t('onboarding.place.nameLabel')}</Label>
+        <Input
+          aria-labelledby="place-name"
+          accessibilityLabel={t('onboarding.place.nameLabel')}
+          value={name}
+          onChangeText={setName}
+          placeholder={t('onboarding.place.namePlaceholder')}
+          maxLength={24}
+        />
+      </View>
 
-      <View style={styles.spot}>
+      <View className="gap-2">
         {locating ? (
-          <View style={styles.row}>
-            <ActivityIndicator color={theme.accent} />
-            <AppText color="textMuted">{t('onboarding.place.locating')}</AppText>
+          <View className="min-h-11 flex-row items-center gap-2">
+            <ActivityIndicator colorClassName="accent-primary" />
+            <Text className="text-muted-foreground">{t('onboarding.place.locating')}</Text>
           </View>
         ) : spot ? (
-          <View style={styles.row}>
-            <Icon name="pin" size={20} color="accent" strokeWidth={2} />
-            <AppText variant="bodyStrong" color="accent" style={styles.flex}>
+          <View className="min-h-11 flex-row items-center gap-2">
+            <Icon as={MapPin} className="text-primary size-5" />
+            <Text className="text-primary flex-1 font-semibold">
               {t('onboarding.place.saved', { accuracy: Math.round(spot.accuracy ?? 0) })}
-            </AppText>
-            <Button kind="text" align="center" label={t('onboarding.place.relocate')} onPress={locate} />
+            </Text>
+            <Button variant="link" className="px-0" onPress={locate}>
+              <Text>{t('onboarding.place.relocate')}</Text>
+            </Button>
           </View>
         ) : (
-          <Button kind="secondary" label={t('onboarding.place.useCurrent')} onPress={locate} />
+          <Button size="lg" variant="secondary" onPress={locate}>
+            <Text>{t('onboarding.place.useCurrent')}</Text>
+          </Button>
         )}
-        <AppText variant="caption" color="textMuted">
-          {isSimulatedLocation
-            ? `${t('onboarding.place.radiusNote', { radius: DEFAULT_RADIUS })} · ${t('settings.previewNote')}`
-            : t('onboarding.place.radiusNote', { radius: DEFAULT_RADIUS })}
-        </AppText>
+        <Text className="text-muted-foreground text-xs">
+          {isSimulatedLocation ? `${radiusNote} · ${t('settings.previewNote')}` : radiusNote}
+        </Text>
       </View>
 
       {problem === 'denied' ? <Notice title={t('checkIn.deniedTitle')} body={t('checkIn.denied')} /> : null}
-      {problem === 'unavailable' ? (
-        <Notice title={t('checkIn.unavailableTitle')} body={t('checkIn.unavailable')} />
-      ) : null}
+      {problem === 'unavailable' ? <Notice title={t('checkIn.unavailableTitle')} body={t('checkIn.unavailable')} /> : null}
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  heading: { gap: Spacing.sm, paddingTop: Spacing.lg },
-  spot: { gap: Spacing.sm },
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, minHeight: 52 },
-  flex: { flex: 1 },
-});

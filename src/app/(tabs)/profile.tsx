@@ -1,15 +1,16 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { Button } from '@/components/button';
 import { EmptyState } from '@/components/empty-state';
-import { Icon } from '@/components/icon';
 import { ListScreen } from '@/components/list-screen';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
 import { PostCard } from '@/features/feed/post-card';
 import { useMe, useMyPosts } from '@/features/feed/use-feed';
 import { ProfileHeader } from '@/features/social/profile-header';
+import { Settings } from '@/lib/icons';
 import { useAppStore } from '@/store/app-store';
 
 /** 내 프로필: 이름, 숫자, 내 기록 */
@@ -25,22 +26,16 @@ export default function ProfileScreen() {
     <ListScreen
       edges={['top', 'left', 'right']}
       divided
-      gap={Spacing.xl}
       data={posts}
       keyExtractor={(p) => p.id}
       renderItem={(post) => <PostCard post={post} />}
       header={
         <>
-          <View style={styles.topRow}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('settings.title')}
-              hitSlop={10}
-              onPress={() => router.push('/settings')}>
-              <Icon name="settings" />
-            </Pressable>
+          <View className="flex-row justify-end">
+            <Button variant="ghost" size="icon" accessibilityLabel={t('settings.title')} onPress={() => router.push('/settings')}>
+              <Icon as={Settings} className="size-6" />
+            </Button>
           </View>
-
           <ProfileHeader
             displayName={me.displayName}
             username={me.username}
@@ -59,14 +54,14 @@ export default function ProfileScreen() {
                 onPress: () => router.push({ pathname: '/follows', params: { tab: 'following' } }),
               },
             ]}>
-            <View style={styles.actions}>
-              <Button kind="secondary" size="small" label={t('profile.edit')} onPress={() => router.push('/profile-edit')} />
+            <View className="flex-row items-center gap-4">
+              <Button variant="secondary" size="sm" className="rounded-full px-4" onPress={() => router.push('/profile-edit')}>
+                <Text>{t('profile.edit')}</Text>
+              </Button>
               {social.incoming.length > 0 ? (
-                <Button
-                  kind="text"
-                  label={t('profile.requests', { count: social.incoming.length })}
-                  onPress={() => router.push('/requests')}
-                />
+                <Button variant="link" size="sm" className="px-0" onPress={() => router.push('/requests')}>
+                  <Text>{t('profile.requests', { count: social.incoming.length })}</Text>
+                </Button>
               ) : null}
             </View>
           </ProfileHeader>
@@ -76,8 +71,3 @@ export default function ProfileScreen() {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  topRow: { flexDirection: 'row', justifyContent: 'flex-end', paddingTop: Spacing.sm },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
-});

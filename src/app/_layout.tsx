@@ -1,8 +1,12 @@
+import '@/global.css';
+
+import { PortalHost } from '@rn-primitives/portal';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
+import { Uniwind } from 'uniwind';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -17,6 +21,11 @@ export default function RootLayout() {
   const hydrated = useStoreHydrated();
   const language = useAppStore((s) => s.language);
   const { i18n } = useTranslation();
+
+  // className 색(라이트/다크)을 앱의 색 모드와 맞춤 (웹 미리보기의 data-theme까지 따라감)
+  useEffect(() => {
+    Uniwind.setTheme(scheme === 'dark' ? 'dark' : 'light');
+  }, [scheme]);
 
   // 저장된 언어 설정(기기 언어 / English / 한국어)을 적용
   useEffect(() => {
@@ -43,6 +52,7 @@ export default function RootLayout() {
         ) : (
           <View style={{ flex: 1, backgroundColor: theme.background }} />
         )}
+        <PortalHost />
       </ThemeProvider>
     </SafeAreaProvider>
   );

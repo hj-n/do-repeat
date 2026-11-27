@@ -1,43 +1,36 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Avatar } from '@/components/avatar';
-import { Icon } from '@/components/icon';
-import { Spacing } from '@/constants/theme';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
 import type { Person } from '@/data/sample-people';
+import { Lock } from '@/lib/icons';
+
+import { UserAvatar } from './user-avatar';
 
 /** 사람 한 줄: 동그라미, 이름, @아이디, 오른쪽에 버튼 */
 export function PersonRow({ person, right }: { person: Person; right?: ReactNode }) {
   return (
-    <View style={styles.row}>
+    <View className="flex-row items-center gap-3 py-2">
       <Pressable
         accessibilityRole="link"
         onPress={() => router.push({ pathname: '/user/[id]', params: { id: person.id } })}
-        style={styles.who}>
-        <Avatar name={person.displayName} />
-        <View style={styles.names}>
-          <View style={styles.nameLine}>
-            <AppText variant="bodyStrong" numberOfLines={1}>
+        className="flex-1 flex-row items-center gap-3">
+        <UserAvatar name={person.displayName} className="size-10" />
+        <View className="flex-1">
+          <View className="flex-row items-center gap-1">
+            <Text className="font-semibold" numberOfLines={1}>
               {person.displayName}
-            </AppText>
-            {person.isPrivate ? <Icon name="lock" size={14} color="textMuted" /> : null}
+            </Text>
+            {person.isPrivate ? <Icon as={Lock} className="text-muted-foreground size-3.5" /> : null}
           </View>
-          <AppText variant="label" color="textMuted" numberOfLines={1} style={styles.regular}>
+          <Text className="text-muted-foreground text-sm" numberOfLines={1}>
             @{person.username}
-          </AppText>
+          </Text>
         </View>
       </Pressable>
       {right}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingVertical: Spacing.sm },
-  who: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  names: { flex: 1 },
-  nameLine: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
-  regular: { fontWeight: '400' },
-});

@@ -8,6 +8,9 @@
 
 - [Expo](https://expo.dev) (React Native) + TypeScript: 코드 하나로 iOS, Android, 웹에서 실행됩니다.
 - Expo Router: `src/app/` 폴더 안의 파일 하나가 화면 하나입니다.
+- UI 컴포넌트: [React Native Reusables](https://github.com/founded-labs/react-native-reusables) (shadcn/ui의 React Native판). `src/components/ui/`에 있어요. **컴포넌트는 직접 만들지 않고 여기서 가져다 씁니다.**
+- 스타일: [Uniwind](https://uniwind.dev) (React Native용 Tailwind CSS). `className="text-muted-foreground"`처럼 씁니다. 색은 `src/global.css`의 CSS 변수가 기준이에요.
+- 아이콘: [lucide](https://lucide.dev). `src/lib/icons.ts`에 쓰는 아이콘만 등록해서 가져와요.
 
 ## 폴더 구조
 
@@ -29,8 +32,10 @@ src/
     profile-edit.tsx      이름, @아이디 바꾸기
     settings.tsx          공개 범위, 언어, 개발용 도구
   features/               화면을 이루는 큰 부품 (반복 카드, 인증 흐름, 피드 카드, 댓글, 팔로우)
-  components/             버튼, 칩, 입력창, 아이콘 같은 공통 부품
-  constants/theme.ts      디자인 토큰 (색, 글자 크기, 간격, 둥글기)
+  components/ui/          shadcn(React Native Reusables) 컴포넌트: Button, Text, Input, Tabs, Switch …
+  components/             화면 틀 (Screen, ListScreen, TopBar 등)
+  global.css              색 토큰 (shadcn 방식 CSS 변수)
+  constants/theme.ts      같은 색의 JS 사본 (className을 못 쓰는 곳용)
   i18n/locales/           앱 문구: en.ts(영어), ko.ts(한국어)
   store/app-store.ts      앱 데이터 (지금은 기기에 저장, 나중에 서버로 교체)
   data/sample-people.ts   예시 사용자 8명과 그 게시물 (서버 연결 전까지)
@@ -41,7 +46,7 @@ scripts/
   build-preview.mjs       웹 미리보기 빌드
 ```
 
-- **디자인:** `src/constants/theme.ts`에서 색과 글자 크기를 바꾸면 모든 화면에 반영됩니다.
+- **디자인:** 색은 `src/global.css`에서 바꿔요(`src/constants/theme.ts`도 같은 값으로). 글자 크기·간격은 각 화면의 Tailwind 클래스로 정합니다.
 - **색:** 바탕·글자·구분선은 Apple 시스템 회색 단계([HIG Color](https://developer.apple.com/design/human-interface-guidelines/color))를 따르고, 대표 색은 파란색 하나만 써요. 설정처럼 고르기만 하는 화면은 색 없이 굵기와 체크로만 표시해요.
 - **디자인 원칙:** 상자(테두리·배경 있는 카드)는 쓰지 않아요. 여백, 가는 구분선(`Divider`), 글자 크기와 굵기로만 나눕니다. 강조색은 화면의 주요 행동 하나와 N일째, 이번 주에 한 날에만 씁니다.
 - **문구 원칙:** 짧게 씁니다. 한 단어로 되면 한 단어로 써요(예: "완료", "추가", "확인").

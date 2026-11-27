@@ -1,25 +1,25 @@
 import type { Href } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
 import { BackButton } from '@/components/back-button';
-import { Spacing } from '@/constants/theme';
+import { Text } from '@/components/ui/text';
 
-/** 화면 상단: 뒤로 가기 + 가운데 제목 */
-export function TopBar({ title, fallback = '/home' }: { title: string; fallback?: Href }) {
+/** 화면 상단: 뒤로 가기 + 가운데 제목 (+ 아래 작은 부제) */
+export function TopBar({ title, subtitle, fallback = '/home' }: { title: string; subtitle?: string; fallback?: Href }) {
   return (
-    <View style={styles.row}>
+    <View className="flex-row items-center">
       <BackButton fallback={fallback} />
-      <AppText variant="bodyStrong" style={styles.title} numberOfLines={1}>
-        {title}
-      </AppText>
-      <View style={styles.spacer} />
+      <View className="flex-1 items-center">
+        <Text className="font-semibold" numberOfLines={1}>
+          {title}
+        </Text>
+        {subtitle ? (
+          <Text variant="muted" numberOfLines={1}>
+            {subtitle}
+          </Text>
+        ) : null}
+      </View>
+      <View className="w-8" />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', minHeight: 40, gap: Spacing.md },
-  title: { flex: 1, textAlign: 'center' },
-  spacer: { width: 28 },
-});

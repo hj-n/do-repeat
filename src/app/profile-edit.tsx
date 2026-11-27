@@ -1,15 +1,16 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
 import { Screen } from '@/components/screen';
-import { TextField } from '@/components/text-field';
 import { TopBar } from '@/components/top-bar';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 import { SAMPLE_PEOPLE } from '@/data/sample-people';
+import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/app-store';
 
 const USERNAME = /^[a-z0-9._]{3,20}$/;
@@ -37,32 +38,40 @@ export default function ProfileEditScreen() {
   };
 
   return (
-    <Screen footer={<Button label={t('editProfile.save')} disabled={!!error} onPress={save} />}>
+    <Screen
+      footer={
+        <Button size="lg" disabled={!!error} onPress={save}>
+          <Text>{t('editProfile.save')}</Text>
+        </Button>
+      }>
       <TopBar title={t('editProfile.title')} fallback="/profile" />
-      <TextField
-        label={t('editProfile.displayName')}
-        value={displayName}
-        onChangeText={setDisplayName}
-        placeholder={profile.username}
-        maxLength={30}
-      />
-      <View style={styles.field}>
-        <TextField
-          label={t('editProfile.username')}
+      <View className="gap-2">
+        <Label nativeID="display-name">{t('editProfile.displayName')}</Label>
+        <Input
+          aria-labelledby="display-name"
+          accessibilityLabel={t('editProfile.displayName')}
+          value={displayName}
+          onChangeText={setDisplayName}
+          placeholder={profile.username}
+          maxLength={30}
+        />
+      </View>
+      <View className="gap-2">
+        <Label nativeID="username">{t('editProfile.username')}</Label>
+        <Input
+          aria-labelledby="username"
+          accessibilityLabel={t('editProfile.username')}
+          aria-invalid={!!error}
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
           autoCorrect={false}
           maxLength={20}
         />
-        <AppText variant="caption" color={error ? 'danger' : 'textMuted'}>
+        <Text className={cn('text-xs', error ? 'text-destructive' : 'text-muted-foreground')}>
           {error ?? t('editProfile.usernameHint')}
-        </AppText>
+        </Text>
       </View>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  field: { gap: Spacing.sm },
-});

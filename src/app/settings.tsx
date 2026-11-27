@@ -2,27 +2,27 @@ import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { Fragment, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, StyleSheet, Switch, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
-import { Divider } from '@/components/divider';
-import { OptionRow } from '@/components/option-row';
 import { Screen } from '@/components/screen';
-import { Segmented } from '@/components/segmented';
 import { TopBar } from '@/components/top-bar';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Text } from '@/components/ui/text';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { SAMPLE_FOLLOWER_IDS } from '@/data/sample-people';
 import { PreviewPositionControl } from '@/features/check-in/preview-position-control';
-import { useTheme } from '@/hooks/use-theme';
 import { deviceLanguage, type LanguageSetting } from '@/i18n';
+import { cn } from '@/lib/utils';
 import { useAppStore, type Visibility } from '@/store/app-store';
 
 const SAMPLE_DAYS = 12;
 
-/** 설정: 공개, 언어, 개발용 */
+/** 설정: 공개, 언어, 개발용. 색 없이 굵기와 체크로만 표시해요 */
 export default function SettingsScreen() {
-  const theme = useTheme();
   const { t } = useTranslation();
   const language = useAppStore((s) => s.language);
   const setLanguage = useAppStore((s) => s.setLanguage);
@@ -38,16 +38,11 @@ export default function SettingsScreen() {
   const [done, setDone] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
 
-  const visibilityOptions: { value: Visibility; label: string }[] = [
-    { value: 'public', label: t('profile.public') },
-    { value: 'private', label: t('profile.private') },
-  ];
   const languages: { value: LanguageSetting; label: string }[] = [
     { value: 'system', label: t('settings.languageSystemCurrent', { language: t(`language.${deviceLanguage()}`) }) },
     { value: 'en', label: t('language.en') },
     { value: 'ko', label: t('language.ko') },
   ];
-
   const tools: { label: string; disabled?: boolean; run: () => void }[] = [
     { label: t('settings.fillSample', { count: SAMPLE_DAYS }), disabled: !hasHabits, run: () => fillSampleHistory(SAMPLE_DAYS) },
     { label: t('settings.receiveFollows'), run: () => receiveSampleFollows(SAMPLE_FOLLOWER_IDS) },
@@ -59,25 +54,25 @@ export default function SettingsScreen() {
       <TopBar title={t('settings.title')} fallback="/profile" />
 
       <Section title={t('settings.privacy')}>
-        <View style={styles.row}>
-          <View style={styles.flex}>
-            <AppText>{t('settings.privateAccount')}</AppText>
-            <AppText variant="caption" color="textMuted">
+        <View className="flex-row items-center gap-4 py-3">
+          <View className="flex-1 gap-0.5">
+            <Label nativeID="private-account" onPress={() => updateProfile({ isPrivate: !profile.isPrivate })}>
+              {t('settings.privateAccount')}
+            </Label>
+            <Text variant="muted" className="text-xs">
               {profile.isPrivate && hasIncoming
                 ? t('settings.publicAcceptsRequests')
                 : profile.isPrivate
                   ? t('settings.privateAccountNote')
                   : t('settings.publicAccountNote')}
-            </AppText>
+            </Text>
           </View>
           <Switch
+            aria-labelledby="private-account"
             accessibilityLabel={t('settings.privateAccount')}
-            value={profile.isPrivate}
-            onValueChange={(isPrivate) => updateProfile({ isPrivate })}
-            trackColor={{ false: theme.surfaceMuted, true: theme.text }}
-            thumbColor={theme.background}
-            // 웹(react-native-web)은 켜진 상태의 동그라미 색을 따로 받아요
-            {...(Platform.OS === 'web' ? ({ activeThumbColor: theme.background } as object) : {})}
+            checked={profile.isPrivate}
+            onCheckedChange={(isPrivate) => updateProfile({ isPrivate })}
+            className={cn(profile.isPrivate && 'bg-foreground')}
           />
         </View>
         {(
@@ -87,98 +82,115 @@ export default function SettingsScreen() {
           ] as const
         ).map(([key, label]) => (
           <Fragment key={key}>
-            <Divider />
-            <View style={styles.row}>
-              <AppText style={styles.flex}>{label}</AppText>
-              <Segmented<Visibility>
+            <Separator />
+            <View className="flex-row items-center gap-4 py-3">
+              <Text className="flex-1">{label}</Text>
+              <ToggleGroup
+                type="single"
+                variant="outline"
+                size="sm"
                 accessibilityLabel={label}
                 value={profile[key]}
-                onChange={(value) => updateProfile({ [key]: value })}
-                options={visibilityOptions}
-              />
+                onValueChange={(value) => {
+                  if (value === 'public' || value === 'private') updateProfile({ [key]: value as Visibility });
+                }}>
+                <ToggleGroupItem value="public" aria-label={t('profile.public')} isFirst>
+                  <Text>{t('profile.public')}</Text>
+                </ToggleGroupItem>
+                <ToggleGroupItem value="private" aria-label={t('profile.private')} isLast>
+                  <Text>{t('profile.private')}</Text>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </View>
           </Fragment>
         ))}
       </Section>
 
       <Section title={t('settings.language')}>
-        {languages.map((option, i) => (
-          <Fragment key={option.value}>
-            {i > 0 ? <Divider /> : null}
-            <OptionRow
-              tone="neutral"
-              title={option.label}
-              selected={option.value === language}
-              onPress={() => setLanguage(option.value)}
-            />
-          </Fragment>
-        ))}
+        <RadioGroup value={language} onValueChange={(v) => setLanguage(v as LanguageSetting)} className="gap-0">
+          {languages.map((option, i) => (
+            <Fragment key={option.value}>
+              {i > 0 ? <Separator /> : null}
+              <Pressable onPress={() => setLanguage(option.value)} className="flex-row items-center gap-4 py-3.5">
+                <View className="flex-1">
+                  <Label
+                    nativeID={`lang-${option.value}`}
+                    onPress={() => setLanguage(option.value)}
+                    className={cn('text-base', option.value === language ? 'font-bold' : 'font-normal')}>
+                    {option.label}
+                  </Label>
+                </View>
+                <RadioGroupItem
+                  value={option.value}
+                  aria-labelledby={`lang-${option.value}`}
+                  accessibilityLabel={option.label}
+                  indicatorClassName="bg-foreground"
+                />
+              </Pressable>
+            </Fragment>
+          ))}
+        </RadioGroup>
       </Section>
 
       <Section title={t('settings.devTools')}>
         <PreviewPositionControl />
-        <View style={styles.tools}>
+        <View className="items-start gap-1 pt-3">
           {tools.map((tool) => (
             <Button
               key={tool.label}
-              kind="text"
-              tone="neutral"
-              label={tool.label}
+              variant="link"
+              className="h-auto px-0 py-1.5"
               disabled={tool.disabled}
               onPress={() => {
                 tool.run();
                 setDone(tool.label);
-              }}
-            />
+              }}>
+              <Text className="text-foreground">{tool.label}</Text>
+            </Button>
           ))}
           {confirmReset ? (
-            <View style={styles.confirm}>
-              <AppText variant="bodyStrong">{t('settings.resetConfirm')}</AppText>
-              <Button kind="text" tone="neutral" label={t('settings.resetNo')} onPress={() => setConfirmReset(false)} />
+            <View className="flex-row flex-wrap items-center gap-4 py-1.5">
+              <Text className="font-semibold">{t('settings.resetConfirm')}</Text>
+              <Button variant="link" className="h-auto px-0" onPress={() => setConfirmReset(false)}>
+                <Text className="text-foreground">{t('settings.resetNo')}</Text>
+              </Button>
               <Button
-                kind="text"
-                tone="neutral"
-                label={t('settings.resetYes')}
+                variant="link"
+                className="h-auto px-0"
                 onPress={() => {
                   resetAll();
                   router.replace('/onboarding');
-                }}
-              />
+                }}>
+                <Text className="text-foreground">{t('settings.resetYes')}</Text>
+              </Button>
             </View>
           ) : (
-            <Button kind="text" tone="neutral" label={t('settings.reset')} onPress={() => setConfirmReset(true)} />
+            <Button variant="link" className="h-auto px-0 py-1.5" onPress={() => setConfirmReset(true)}>
+              <Text className="text-foreground">{t('settings.reset')}</Text>
+            </Button>
           )}
           {done ? (
-            <AppText variant="caption" color="textMuted">
+            <Text variant="muted" className="text-xs">
               {t('settings.toolDone', { tool: done })}
-            </AppText>
+            </Text>
           ) : null}
         </View>
       </Section>
 
-      <AppText variant="caption" color="textMuted" style={styles.version}>
+      <Text variant="muted" className="pt-4 text-center text-xs">
         {t('settings.version', { version: Constants.expoConfig?.version ?? '' })}
-      </AppText>
+      </Text>
     </Screen>
   );
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View style={styles.section}>
-      <AppText variant="label" color="textMuted">
+    <View className="gap-1">
+      <Text variant="muted" className="font-medium">
         {title}
-      </AppText>
+      </Text>
       <View>{children}</View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  section: { gap: Spacing.xs },
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg, paddingVertical: Spacing.md },
-  flex: { flex: 1, gap: 2 },
-  tools: { gap: Spacing.xs, paddingTop: Spacing.md },
-  confirm: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg, flexWrap: 'wrap' },
-  version: { textAlign: 'center', paddingTop: Spacing.lg },
-});

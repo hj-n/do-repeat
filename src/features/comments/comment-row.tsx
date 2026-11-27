@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Avatar } from '@/components/avatar';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { findPerson } from '@/data/sample-people';
 import { useMe } from '@/features/feed/use-feed';
+import { UserAvatar } from '@/features/social/user-avatar';
 import { timeAgo } from '@/lib/dates';
 import { useAppStore, type Comment } from '@/store/app-store';
 
@@ -16,45 +16,32 @@ export function CommentRow({ comment }: { comment: Comment }) {
   const me = useMe();
   const deleteComment = useAppStore((s) => s.deleteComment);
   const isMine = comment.authorId === 'me';
-  const person = isMine ? undefined : findPerson(comment.authorId);
-  const name = isMine ? me.displayName : (person?.displayName ?? '');
-
-  const openAuthor = () =>
-    isMine
-      ? router.navigate('/profile')
-      : router.push({ pathname: '/user/[id]', params: { id: comment.authorId } });
+  const name = isMine ? me.displayName : (findPerson(comment.authorId)?.displayName ?? '');
 
   return (
-    <View style={styles.row}>
-      <Pressable accessibilityRole="link" accessibilityLabel={name} onPress={openAuthor}>
-        <Avatar name={name} size={32} />
+    <View className="flex-row gap-3 py-2">
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={name}
+        onPress={() =>
+          isMine ? router.navigate('/profile') : router.push({ pathname: '/user/[id]', params: { id: comment.authorId } })
+        }>
+        <UserAvatar name={name} className="size-8" textClassName="text-xs" />
       </Pressable>
-      <View style={styles.body}>
-        <View style={styles.meta}>
-          <AppText variant="label" numberOfLines={1} style={styles.name}>
+      <View className="flex-1 gap-0.5">
+        <View className="flex-row items-center gap-2">
+          <Text className="shrink text-sm font-semibold" numberOfLines={1}>
             {name}
-          </AppText>
-          <AppText variant="caption" color="textMuted">
-            {timeAgo(comment.at, t, i18n.language)}
-          </AppText>
+          </Text>
+          <Text className="text-muted-foreground text-xs">{timeAgo(comment.at, t, i18n.language)}</Text>
           {isMine ? (
-            <Pressable accessibilityRole="button" hitSlop={8} onPress={() => deleteComment(comment.id)}>
-              <AppText variant="caption" color="textMuted" style={styles.delete}>
-                {t('post.deleteComment')}
-              </AppText>
-            </Pressable>
+            <Button variant="link" size="sm" className="h-auto px-0" onPress={() => deleteComment(comment.id)}>
+              <Text className="text-muted-foreground text-xs">{t('post.deleteComment')}</Text>
+            </Button>
           ) : null}
         </View>
-        <AppText>{comment.text}</AppText>
+        <Text>{comment.text}</Text>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: Spacing.md, paddingVertical: Spacing.sm },
-  body: { flex: 1, gap: 2 },
-  meta: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  name: { flexShrink: 1 },
-  delete: { textDecorationLine: 'underline' },
-});

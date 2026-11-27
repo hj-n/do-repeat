@@ -1,12 +1,11 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
 import { Screen } from '@/components/screen';
 import { StepHeader } from '@/components/step-header';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { finishOnboarding } from '@/features/onboarding/finish';
 import { habitTitle, isPresetId } from '@/lib/habits';
 import { useAppStore } from '@/store/app-store';
@@ -24,23 +23,21 @@ export default function ReadyScreen() {
   };
 
   return (
-    <Screen footer={<Button label={t('common.start')} onPress={start} />}>
+    <Screen
+      footer={
+        <Button size="lg" onPress={start}>
+          <Text>{t('common.start')}</Text>
+        </Button>
+      }>
       <StepHeader step={3} total={3} />
-
-      <View style={styles.heading}>
-        <AppText variant="title">{t('onboarding.ready.title')}</AppText>
-        <AppText color="textMuted">{t('onboarding.ready.subtitle')}</AppText>
+      <View className="gap-2 pt-4">
+        <Text className="text-2xl font-bold tracking-tight">{t('onboarding.ready.title')}</Text>
+        <Text className="text-muted-foreground">{t('onboarding.ready.subtitle')}</Text>
       </View>
-
-      <View style={styles.summary}>
-        <AppText variant="display">{habitTitle(draft, t)}</AppText>
-        <AppText color="textMuted">{t('onboarding.method.photoDescription')}</AppText>
+      <View className="gap-1 pt-6">
+        <Text className="text-4xl font-extrabold tracking-tight">{habitTitle(draft, t)}</Text>
+        <Text className="text-muted-foreground">{t('onboarding.method.photoDescription')}</Text>
       </View>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  heading: { gap: Spacing.sm, paddingTop: Spacing.lg },
-  summary: { paddingTop: Spacing.xl, gap: Spacing.xs },
-});

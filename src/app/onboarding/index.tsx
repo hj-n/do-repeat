@@ -1,17 +1,17 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
-import { Chip } from '@/components/chip';
 import { LanguageSwitch } from '@/components/language-switch';
 import { Screen } from '@/components/screen';
 import { StepHeader } from '@/components/step-header';
-import { TextField } from '@/components/text-field';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
+import { Toggle } from '@/components/ui/toggle';
 import { PRESETS, type PresetId } from '@/lib/habits';
+import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/app-store';
 
 const CUSTOM = 'custom';
@@ -30,38 +30,61 @@ export default function WhatDoYouRepeat() {
     router.push({ pathname: '/onboarding/method', params });
   };
 
+  const options: { value: PresetId | typeof CUSTOM; label: string }[] = [
+    ...PRESETS.map((id) => ({ value: id, label: t(`presets.${id}`) })),
+    { value: CUSTOM, label: t('onboarding.what.custom') },
+  ];
+
   return (
-    <Screen footer={<Button label={t('common.next')} disabled={!ready} onPress={next} />}>
-      <View style={styles.top}>
-        <View style={styles.flex}>
+    <Screen
+      footer={
+        <Button size="lg" disabled={!ready} onPress={next}>
+          <Text>{t('common.next')}</Text>
+        </Button>
+      }>
+      <View className="flex-row items-center gap-4">
+        <View className="flex-1">
           <StepHeader step={1} total={3} canGoBack={hasHabits} />
         </View>
         <LanguageSwitch />
       </View>
 
-      <View style={styles.heading}>
-        <AppText variant="display">{t('onboarding.what.title')}</AppText>
-        <AppText color="textMuted">{t('onboarding.what.subtitle')}</AppText>
+      <View className="gap-2 pt-4">
+        <Text className="text-4xl font-extrabold tracking-tight">{t('onboarding.what.title')}</Text>
+        <Text className="text-muted-foreground">{t('onboarding.what.subtitle')}</Text>
       </View>
 
-      <View style={styles.chips}>
-        {PRESETS.map((id) => (
-          <Chip
-            key={id}
-            label={t(`presets.${id}`)}
-            selected={picked === id}
-            onPress={() => setPicked(id)}
-          />
-        ))}
-        <Chip
-          label={t('onboarding.what.custom')}
-          selected={picked === CUSTOM}
-          onPress={() => setPicked(CUSTOM)}
-        />
+      <View className="flex-row flex-wrap gap-2">
+        {options.map((option) => {
+          const selected = picked === option.value;
+          return (
+            <Toggle
+              key={option.value}
+              pressed={selected}
+              onPressedChange={() => setPicked(option.value)}
+              aria-label={option.label}
+              className={cn(
+                'rounded-full px-4',
+                // hover/active colors too, so the web preview keeps the chosen chip blue under the mouse
+                selected
+                  ? 'bg-primary hover:bg-primary/90 active:bg-primary/90'
+                  : 'bg-secondary hover:bg-secondary/80 active:bg-secondary/80'
+              )}>
+              <Text
+                className={cn(
+                  // Toggle passes its own classes to the text too; keep the text background clear
+                  'bg-transparent px-0 font-semibold',
+                  selected ? 'text-primary-foreground' : 'text-secondary-foreground'
+                )}>
+                {option.label}
+              </Text>
+            </Toggle>
+          );
+        })}
       </View>
 
       {picked === CUSTOM ? (
-        <TextField
+        <Input
           autoFocus
           value={custom}
           onChangeText={setCustom}
@@ -74,10 +97,3 @@ export default function WhatDoYouRepeat() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  top: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
-  flex: { flex: 1 },
-  heading: { gap: Spacing.sm, paddingTop: Spacing.lg },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
-});

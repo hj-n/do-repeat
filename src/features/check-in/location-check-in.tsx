@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Linking, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Linking, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
-import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { distanceInMeters, formatDistance, isWithinPlace } from '@/lib/geo';
 import { habitTitle } from '@/lib/habits';
 import { getCurrentPosition } from '@/lib/location';
@@ -29,7 +27,6 @@ type Phase =
  * 등록한 장소 반경 안이면 그 자리에서 인증됩니다.
  */
 export function LocationCheckIn({ habit }: { habit: Habit }) {
-  const theme = useTheme();
   const { t } = useTranslation();
   const checkIn = useAppStore((s) => s.checkIn);
   const streak = useStreak(habit.id);
@@ -82,34 +79,34 @@ export function LocationCheckIn({ habit }: { habit: Habit }) {
   }
 
   return (
-    <View style={styles.wrap}>
+    <View className="flex-1 justify-between gap-8">
       {phase.kind === 'checking' ? (
-        <View style={styles.checking}>
-          <ActivityIndicator size="large" color={theme.accent} />
-          <AppText variant="bodyStrong">{t('checkIn.checking')}</AppText>
-          {place ? <AppText color="textMuted">{place.name}</AppText> : null}
+        <View className="items-center gap-3 pt-24">
+          <ActivityIndicator size="large" colorClassName="accent-primary" />
+          <Text className="font-semibold">{t('checkIn.checking')}</Text>
+          {place ? <Text className="text-muted-foreground">{place.name}</Text> : null}
         </View>
       ) : (
-        <View style={styles.failure}>
+        <View className="gap-4 pt-6">
           {phase.kind === 'tooFar' && place ? (
             <Notice
               title={t('checkIn.tooFarTitle')}
               body={t('checkIn.tooFar', { distance: formatDistance(phase.distance), place: place.name })}
             />
           ) : null}
-          {phase.kind === 'denied' ? (
-            <Notice title={t('checkIn.deniedTitle')} body={t('checkIn.denied')} />
-          ) : null}
-          {phase.kind === 'mocked' ? (
-            <Notice title={t('checkIn.mockedTitle')} body={t('checkIn.mocked')} />
-          ) : null}
+          {phase.kind === 'denied' ? <Notice title={t('checkIn.deniedTitle')} body={t('checkIn.denied')} /> : null}
+          {phase.kind === 'mocked' ? <Notice title={t('checkIn.mockedTitle')} body={t('checkIn.mocked')} /> : null}
           {phase.kind === 'unavailable' ? (
             <Notice title={t('checkIn.unavailableTitle')} body={t('checkIn.unavailable')} />
           ) : null}
 
-          <Button label={t('common.retry')} onPress={retry} />
+          <Button size="lg" onPress={retry}>
+            <Text>{t('common.retry')}</Text>
+          </Button>
           {phase.kind === 'denied' ? (
-            <Button kind="text" align="center" label={t('common.openSettings')} onPress={() => Linking.openSettings()} />
+            <Button variant="link" onPress={() => Linking.openSettings()}>
+              <Text>{t('common.openSettings')}</Text>
+            </Button>
           ) : null}
         </View>
       )}
@@ -118,9 +115,3 @@ export function LocationCheckIn({ habit }: { habit: Habit }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: { flex: 1, gap: Spacing.xxl, justifyContent: 'space-between' },
-  checking: { alignItems: 'center', gap: Spacing.md, paddingTop: 96 },
-  failure: { gap: Spacing.md, paddingTop: Spacing.xl },
-});

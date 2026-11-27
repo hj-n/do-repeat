@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { Button } from '@/components/button';
 import { EmptyState } from '@/components/empty-state';
 import { ListScreen } from '@/components/list-screen';
 import { TopBar } from '@/components/top-bar';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { SAMPLE_PEOPLE } from '@/data/sample-people';
 import { PersonRow } from '@/features/social/person-row';
 import { useAppStore } from '@/store/app-store';
@@ -21,15 +21,18 @@ export default function RequestsScreen() {
   return (
     <ListScreen
       data={people}
-      gap={0}
       keyExtractor={(p) => p.id}
       renderItem={(person) => (
         <PersonRow
           person={person}
           right={
-            <View style={styles.actions}>
-              <Button size="small" label={t('requests.accept')} onPress={() => accept(person.id)} />
-              <Button size="small" kind="secondary" label={t('requests.decline')} onPress={() => decline(person.id)} />
+            <View className="flex-row gap-1">
+              <Button size="sm" className="rounded-full px-4" onPress={() => accept(person.id)}>
+                <Text>{t('requests.accept')}</Text>
+              </Button>
+              <Button size="sm" variant="secondary" className="rounded-full px-4" onPress={() => decline(person.id)}>
+                <Text>{t('requests.decline')}</Text>
+              </Button>
             </View>
           }
         />
@@ -39,7 +42,3 @@ export default function RequestsScreen() {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  actions: { flexDirection: 'row', gap: Spacing.xs },
-});

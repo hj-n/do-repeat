@@ -1,37 +1,29 @@
-import { Pressable, StyleSheet, View } from 'react-native';
-
-import { AppText } from '@/components/app-text';
-import { Spacing } from '@/constants/theme';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Text } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
 
 type TextTabsProps<T extends string> = {
-  options: { value: T; label: string }[];
   value: T;
-  onChange: (value: T) => void;
+  onValueChange: (value: T) => void;
+  options: { value: T; label: string }[];
 };
 
-/** 글자로만 된 탭 (예: 팔로잉  둘러보기). 고른 쪽만 진하게 */
-export function TextTabs<T extends string>({ options, value, onChange }: TextTabsProps<T>) {
+/** shadcn Tabs를 글자만 보이게 쓴 것: 고른 탭은 굵고 진하게, 나머지는 회색 (상자 없이) */
+export function TextTabs<T extends string>({ value, onValueChange, options }: TextTabsProps<T>) {
   return (
-    <View accessibilityRole="tablist" style={styles.row}>
-      {options.map((option) => {
-        const selected = option.value === value;
-        return (
-          <Pressable
+    <Tabs value={value} onValueChange={(v) => onValueChange(v as T)}>
+      <TabsList className="h-auto gap-5 bg-transparent p-0">
+        {options.map((option) => (
+          <TabsTrigger
             key={option.value}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: selected }}
-            hitSlop={8}
-            onPress={() => onChange(option.value)}>
-            <AppText variant="bodyStrong" color={selected ? 'text' : 'textMuted'}>
+            value={option.value}
+            className="border-0 bg-transparent px-0 py-1 shadow-none dark:bg-transparent">
+            <Text className={cn('text-base', option.value === value ? 'text-foreground font-bold' : 'text-muted-foreground font-medium')}>
               {option.label}
-            </AppText>
-          </Pressable>
-        );
-      })}
-    </View>
+            </Text>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: Spacing.xl },
-});

@@ -1,31 +1,22 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, KeyboardAvoidingView, Platform, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
 import { EmptyState } from '@/components/empty-state';
+import { SafeAreaView } from '@/components/safe-area-view';
 import { TopBar } from '@/components/top-bar';
-import { MaxContentWidth, Radius, Spacing, Type } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
 import { CommentRow } from '@/features/comments/comment-row';
 import { PostCard } from '@/features/feed/post-card';
 import { usePost } from '@/features/feed/use-feed';
 import { useComments } from '@/features/feed/use-reactions';
-import { useTheme } from '@/hooks/use-theme';
 import { COMMENT_MAX, useAppStore } from '@/store/app-store';
 
 /** 게시물 하나와 댓글. 아래 입력칸에서 댓글을 남겨요 */
 export default function PostScreen() {
-  const theme = useTheme();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const post = usePost(id);
@@ -41,28 +32,28 @@ export default function PostScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
-      <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <SafeAreaView className="bg-background flex-1">
+      <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <FlatList
           data={post ? comments : []}
           keyExtractor={(c) => c.id}
-          contentContainerStyle={styles.content}
+          contentContainerClassName="px-6 pb-6 pt-4"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View style={styles.column}>
+            <View className="w-full max-w-[480px] self-center">
               <CommentRow comment={item} />
             </View>
           )}
           ListHeaderComponent={
-            <View style={[styles.column, styles.header]}>
+            <View className="mb-2 w-full max-w-[480px] gap-4 self-center">
               <TopBar title={t('post.title')} fallback="/feed" />
               {post ? (
                 <>
                   <PostCard post={post} linkComments={false} />
-                  <AppText variant="label" color="textMuted">
+                  <Text variant="muted" className="font-medium">
                     {t('post.commentsTitle')}
-                  </AppText>
+                  </Text>
                 </>
               ) : (
                 <EmptyState body={t('post.notFound')} />
@@ -71,41 +62,29 @@ export default function PostScreen() {
           }
           ListEmptyComponent={
             post ? (
-              <View style={styles.column}>
-                <AppText color="textMuted">{t('post.noComments')}</AppText>
+              <View className="w-full max-w-[480px] self-center">
+                <Text className="text-muted-foreground">{t('post.noComments')}</Text>
               </View>
             ) : undefined
           }
         />
 
         {post ? (
-          <View style={[styles.bar, { borderTopColor: theme.border, backgroundColor: theme.surface }]}>
-            <View style={[styles.column, styles.barInner]}>
-              <TextInput
+          <View className="border-border bg-background border-t px-4 py-2">
+            <View className="w-full max-w-[480px] flex-row items-center gap-2 self-center">
+              <Input
                 value={text}
                 onChangeText={setText}
                 placeholder={t('post.commentPlaceholder')}
-                placeholderTextColor={theme.textMuted}
                 accessibilityLabel={t('post.commentPlaceholder')}
                 maxLength={COMMENT_MAX}
                 returnKeyType="send"
                 onSubmitEditing={send}
-                style={[
-                  styles.input,
-                  Type.body,
-                  { color: theme.text, backgroundColor: theme.surfaceMuted },
-                ]}
+                className="flex-1 rounded-full"
               />
-              <Pressable
-                accessibilityRole="button"
-                disabled={!canSend}
-                onPress={send}
-                hitSlop={8}
-                style={styles.send}>
-                <AppText variant="bodyStrong" color={canSend ? 'accent' : 'textMuted'}>
-                  {t('post.send')}
-                </AppText>
-              </Pressable>
+              <Button variant="link" disabled={!canSend} onPress={send} className="px-2">
+                <Text>{t('post.send')}</Text>
+              </Button>
             </View>
           </View>
         ) : null}
@@ -113,19 +92,3 @@ export default function PostScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  root: { flex: 1 },
-  content: { paddingHorizontal: Spacing.xl, paddingTop: Spacing.lg, paddingBottom: Spacing.xl },
-  column: { width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
-  header: { gap: Spacing.lg, marginBottom: Spacing.sm },
-  bar: { borderTopWidth: 1, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm },
-  barInner: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  input: {
-    flex: 1,
-    borderRadius: Radius.pill,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm + 2,
-  },
-  send: { paddingVertical: Spacing.sm },
-});

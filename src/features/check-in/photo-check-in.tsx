@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Linking, StyleSheet, View } from 'react-native';
+import { Image, Linking, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
-import { NoteField } from '@/components/note-field';
-import { Radius, Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { habitTitle } from '@/lib/habits';
 import { takeCheckInPhoto, usesFilePicker } from '@/lib/photo';
 import { summarizeStreak } from '@/lib/streak';
 import { NOTE_MAX, useAppStore, useStreak, type Habit } from '@/store/app-store';
 
+import { NoteInput } from './note-input';
 import { Notice } from './notice';
 import { SuccessView } from './success-view';
 
@@ -60,49 +59,42 @@ export function PhotoCheckIn({ habit }: { habit: Habit }) {
   }
 
   return (
-    <View style={styles.wrap}>
+    <View className="flex-1 gap-6 pt-4">
       {photo ? (
-        <Image source={{ uri: photo }} style={styles.photo} accessibilityIgnoresInvertColors />
+        <Image source={{ uri: photo }} className="aspect-[3/4] w-full rounded-xl" accessibilityIgnoresInvertColors />
       ) : (
-        <AppText color="textMuted" style={styles.hint}>
-          {t('checkIn.photoHint')}
-        </AppText>
+        <Text className="text-muted-foreground py-8 text-center">{t('checkIn.photoHint')}</Text>
       )}
 
       {problem === 'denied' ? (
         <Notice title={t('checkIn.cameraDeniedTitle')} body={t('checkIn.cameraDenied')}>
-          <Button kind="text" label={t('common.openSettings')} onPress={() => Linking.openSettings()} />
+          <Button variant="link" className="self-start px-0" onPress={() => Linking.openSettings()}>
+            <Text>{t('common.openSettings')}</Text>
+          </Button>
         </Notice>
       ) : null}
       {problem === 'error' ? <Notice title={t('checkIn.photoTitle')} body={t('checkIn.photoError')} /> : null}
 
       {photo ? (
-        <NoteField
-          label={t('note.label')}
-          value={note}
-          onChangeText={setNote}
-          placeholder={t('note.placeholder')}
-          max={NOTE_MAX}
-        />
+        <NoteInput label={t('note.label')} value={note} onChangeText={setNote} placeholder={t('note.placeholder')} max={NOTE_MAX} />
       ) : null}
 
-      <View style={styles.actions}>
+      <View className="gap-2">
         {photo ? (
           <>
-            <Button label={t('checkIn.usePhoto')} onPress={submit} />
-            <Button kind="text" align="center" label={t('checkIn.retake')} onPress={shoot} />
+            <Button size="lg" onPress={submit}>
+              <Text>{t('checkIn.usePhoto')}</Text>
+            </Button>
+            <Button variant="link" onPress={shoot}>
+              <Text>{t('checkIn.retake')}</Text>
+            </Button>
           </>
         ) : (
-          <Button label={usesFilePicker ? t('checkIn.choosePhoto') : t('checkIn.takePhoto')} onPress={shoot} />
+          <Button size="lg" onPress={shoot}>
+            <Text>{usesFilePicker ? t('checkIn.choosePhoto') : t('checkIn.takePhoto')}</Text>
+          </Button>
         )}
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: { flex: 1, gap: Spacing.xl, paddingTop: Spacing.lg },
-  photo: { width: '100%', aspectRatio: 3 / 4, borderRadius: Radius.lg },
-  hint: { textAlign: 'center', paddingVertical: Spacing.xxl },
-  actions: { gap: Spacing.md, alignItems: 'stretch' },
-});

@@ -3,15 +3,16 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccessibilityInfo, Animated, Image, Linking, StyleSheet, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
-import { NoteField } from '@/components/note-field';
-import { Radius, Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
 import { useTheme } from '@/hooks/use-theme';
+import { Plus } from '@/lib/icons';
 import { takeCheckInPhoto } from '@/lib/photo';
 import { toDateKey } from '@/lib/streak';
 import { NOTE_MAX, useAppStore } from '@/store/app-store';
 
+import { NoteInput } from './note-input';
 import { Notice } from './notice';
 
 type SuccessViewProps = {
@@ -55,36 +56,33 @@ export function SuccessView({ habitName, streak, already, checkInId, photoOption
   }, [already, scale, opacity]);
 
   return (
-    <View style={styles.wrap}>
-      <View style={styles.center}>
-        {/* 도장: 바탕은 비우고 테두리와 글자만 대표 색 (찍힌 잉크처럼) */}
+    <View className="flex-1 gap-6 py-6">
+      <View className="items-center gap-4 py-4">
+        {/* 도장: 바탕은 비우고 테두리와 글자만 대표 색 (찍힌 잉크처럼). 움직임이 있어 색은 style로 줍니다 */}
         <Animated.View
           accessible
           accessibilityLabel={`${habitName} ${t('streak.day', { count: streak })}`}
-          style={[
-            styles.stamp,
-            { borderColor: theme.accent, opacity, transform: [{ scale }, { rotate: '-10deg' }] },
-          ]}>
+          style={[styles.stamp, { borderColor: theme.accent, opacity, transform: [{ scale }, { rotate: '-10deg' }] }]}>
           <View style={[styles.stampInner, { borderColor: theme.accent }]}>
-            <AppText color="accent" style={styles.stampLabel} numberOfLines={1}>
+            <Text style={[styles.stampLabel, { color: theme.accent }]} numberOfLines={1}>
               {habitName}
-            </AppText>
-            <AppText color="accent" style={styles.stampCount} numberOfLines={1} adjustsFontSizeToFit>
+            </Text>
+            <Text style={[styles.stampCount, { color: theme.accent }]} numberOfLines={1} adjustsFontSizeToFit>
               {t('streak.day', { count: streak })}
-            </AppText>
+            </Text>
             <View style={[styles.stampRule, { backgroundColor: theme.accent }]} />
-            <AppText color="accent" style={styles.stampDate}>
-              {toDateKey().replaceAll('-', '.')}
-            </AppText>
+            <Text style={[styles.stampDate, { color: theme.accent }]}>{toDateKey().replaceAll('-', '.')}</Text>
           </View>
         </Animated.View>
-        {already ? <AppText color="textMuted">{t('success.alreadyTitle')}</AppText> : null}
+        {already ? <Text className="text-muted-foreground">{t('success.alreadyTitle')}</Text> : null}
       </View>
 
       {checkInId ? <PhotoAttachment checkInId={checkInId} optional={!!photoOptional} /> : null}
       {checkInId ? <NoteEditor checkInId={checkInId} /> : null}
 
-      <Button label={t('common.backHome')} onPress={() => router.dismissTo('/home')} />
+      <Button size="lg" onPress={() => router.dismissTo('/home')}>
+        <Text>{t('common.backHome')}</Text>
+      </Button>
     </View>
   );
 }
@@ -108,10 +106,12 @@ function PhotoAttachment({ checkInId, optional }: { checkInId: string; optional:
 
   if (photoUri) {
     return (
-      <View style={styles.photoRow}>
-        <Image source={{ uri: photoUri }} style={styles.photo} accessibilityIgnoresInvertColors />
+      <View className="flex-row items-end gap-4">
+        <Image source={{ uri: photoUri }} className="h-32 w-24 rounded-lg" accessibilityIgnoresInvertColors />
         {optional ? (
-          <Button kind="text" label={t('checkIn.removePhoto')} onPress={() => setCheckInPhoto(checkInId, undefined)} />
+          <Button variant="link" className="px-0" onPress={() => setCheckInPhoto(checkInId, undefined)}>
+            <Text>{t('checkIn.removePhoto')}</Text>
+          </Button>
         ) : null}
       </View>
     );
@@ -119,11 +119,16 @@ function PhotoAttachment({ checkInId, optional }: { checkInId: string; optional:
   if (!optional) return null;
 
   return (
-    <View style={styles.photoAdd}>
-      <Button kind="text" label={`+ ${t('checkIn.addPhoto')}`} onPress={add} />
+    <View className="gap-2">
+      <Button variant="link" className="self-start px-0" onPress={add}>
+        <Icon as={Plus} className="text-primary size-4" />
+        <Text>{t('checkIn.addPhoto')}</Text>
+      </Button>
       {problem === 'denied' ? (
         <Notice title={t('checkIn.cameraDeniedTitle')} body={t('checkIn.cameraDenied')}>
-          <Button kind="text" label={t('common.openSettings')} onPress={() => Linking.openSettings()} />
+          <Button variant="link" className="self-start px-0" onPress={() => Linking.openSettings()}>
+            <Text>{t('common.openSettings')}</Text>
+          </Button>
         </Notice>
       ) : null}
       {problem === 'error' ? <Notice title={t('checkIn.photoTitle')} body={t('checkIn.photoError')} /> : null}
@@ -141,65 +146,45 @@ function NoteEditor({ checkInId }: { checkInId: string }) {
 
   if (!editing && saved) {
     return (
-      <View style={styles.saved}>
-        <AppText style={styles.flex}>{saved}</AppText>
-        <Button kind="text" label={t('note.edit')} onPress={() => setEditing(true)} />
+      <View className="flex-row items-start gap-3">
+        <Text className="flex-1">{saved}</Text>
+        <Button variant="link" size="sm" className="h-auto px-0" onPress={() => setEditing(true)}>
+          <Text>{t('note.edit')}</Text>
+        </Button>
       </View>
     );
   }
 
   return (
-    <View style={styles.form}>
-      <NoteField
-        label={t('note.label')}
-        value={draft}
-        onChangeText={setDraft}
-        placeholder={t('note.placeholder')}
-        max={NOTE_MAX}
-      />
-      <View>
-        <Button
-          kind="text"
-          align="end"
-          label={t('note.save')}
-          disabled={draft.trim().length === 0}
-          onPress={() => {
-            setCheckInNote(checkInId, draft);
-            setEditing(false);
-          }}
-        />
-      </View>
+    <View className="gap-1">
+      <NoteInput label={t('note.label')} value={draft} onChangeText={setDraft} placeholder={t('note.placeholder')} max={NOTE_MAX} />
+      <Button
+        variant="link"
+        className="self-end px-0"
+        disabled={draft.trim().length === 0}
+        onPress={() => {
+          setCheckInNote(checkInId, draft);
+          setEditing(false);
+        }}>
+        <Text>{t('note.save')}</Text>
+      </Button>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { flex: 1, gap: Spacing.xl, paddingVertical: Spacing.xl },
-  center: { alignItems: 'center', gap: Spacing.lg, paddingVertical: Spacing.lg },
-  stamp: {
-    width: 184,
-    height: 184,
-    borderRadius: 92,
-    borderWidth: 3.5,
-    padding: 6,
-  },
+  stamp: { width: 184, height: 184, borderRadius: 92, borderWidth: 3.5, padding: 6 },
   stampInner: {
     flex: 1,
     borderRadius: 999,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: 16,
     gap: 2,
   },
   stampLabel: { fontSize: 13, lineHeight: 16, fontWeight: '700', letterSpacing: 1.5, maxWidth: 120 },
   stampCount: { fontSize: 36, lineHeight: 42, fontWeight: '900', fontVariant: ['tabular-nums'] },
   stampRule: { width: 44, height: 1.5, marginVertical: 4, opacity: 0.8 },
   stampDate: { fontSize: 11, lineHeight: 14, fontWeight: '700', letterSpacing: 1, fontVariant: ['tabular-nums'] },
-  photoRow: { flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.lg },
-  photo: { width: 96, height: 128, borderRadius: Radius.md },
-  photoAdd: { gap: Spacing.sm },
-  saved: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md },
-  flex: { flex: 1 },
-  form: { gap: Spacing.xs },
 });

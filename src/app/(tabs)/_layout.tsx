@@ -1,11 +1,12 @@
 import { Tabs } from 'expo-router/js-tabs';
+import type { LucideIcon } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Icon, type IconName } from '@/components/icon';
 import { useTheme } from '@/hooks/use-theme';
+import { House, Rows3, User } from '@/lib/icons';
 
-const TAB_ICONS: Record<string, IconName> = { home: 'home', feed: 'feed', profile: 'profile' };
+const TAB_ICONS: Record<string, LucideIcon> = { home: House, feed: Rows3, profile: User };
 
 /** 아래 탭: 홈 / 피드 / 프로필 */
 export default function TabLayout() {
@@ -29,13 +30,10 @@ export default function TabLayout() {
         },
         tabBarLabelStyle: { fontSize: 11, lineHeight: 16, fontWeight: '600' },
         sceneStyle: { backgroundColor: theme.background },
-        tabBarIcon: ({ focused }) => (
-          <Icon
-            name={TAB_ICONS[route.name] ?? 'home'}
-            color={focused ? 'accent' : 'textMuted'}
-            strokeWidth={focused ? 2.2 : 1.8}
-          />
-        ),
+        tabBarIcon: ({ focused, color }) => {
+          const TabIcon = TAB_ICONS[route.name] ?? House;
+          return <TabIcon color={color} size={22} strokeWidth={focused ? 2.2 : 1.8} />;
+        },
       })}>
       <Tabs.Screen name="home" options={{ title: t('tabs.home') }} />
       <Tabs.Screen name="feed" options={{ title: t('tabs.feed') }} />

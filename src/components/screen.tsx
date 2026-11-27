@@ -1,9 +1,8 @@
 import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
+import { ScrollView, View } from 'react-native';
+import type { Edge } from 'react-native-safe-area-context';
 
-import { MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { SafeAreaView } from '@/components/safe-area-view';
 
 type ScreenProps = {
   children: ReactNode;
@@ -13,38 +12,17 @@ type ScreenProps = {
   edges?: Edge[];
 };
 
-/** 모든 화면의 바탕: 안전 영역, 좌우 여백, 아래 고정 버튼 자리를 잡아줍니다. */
+/** 모든 화면의 바탕: 안전 영역, 좌우 여백, 아래 고정 버튼 자리 */
 export function Screen({ children, footer, edges }: ScreenProps) {
-  const theme = useTheme();
   return (
-    <SafeAreaView edges={edges} style={[styles.root, { backgroundColor: theme.background }]}>
+    <SafeAreaView edges={edges} className="bg-background flex-1">
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerClassName="grow items-center px-6 pb-6 pt-4"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>{children}</View>
+        <View className="w-full max-w-[480px] gap-6">{children}</View>
       </ScrollView>
-      {footer ? <View style={styles.footer}>{footer}</View> : null}
+      {footer ? <View className="w-full max-w-[480px] self-center px-6 pb-4 pt-2">{footer}</View> : null}
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  root: { flex: 1 },
-  scroll: {
-    flexGrow: 1,
-    alignItems: 'center',
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.xl,
-  },
-  content: { width: '100%', maxWidth: MaxContentWidth, gap: Spacing.xl },
-  footer: {
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    paddingHorizontal: Spacing.xl,
-    paddingBottom: Spacing.lg,
-    paddingTop: Spacing.sm,
-  },
-});

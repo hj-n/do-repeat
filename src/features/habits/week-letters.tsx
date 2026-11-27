@@ -1,48 +1,37 @@
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Spacing } from '@/constants/theme';
+import { Text } from '@/components/ui/text';
 import { weekdayInitial } from '@/lib/dates';
 import { thisWeek, toDateKey, type DateKey } from '@/lib/streak';
+import { cn } from '@/lib/utils';
 
-/** 이번 주 요일 글자: 한 날은 대표 색, 안 한 날은 회색, 아직 안 온 날은 더 옅게 */
+/** 이번 주 요일 글자: 한 날은 대표 색, 안 한 날은 회색, 아직 안 온 날은 더 옅게, 오늘은 밑줄 */
 export function WeekLetters({ days }: { days: DateKey[] }) {
   const { t, i18n } = useTranslation();
   const done = new Set(days);
   const today = toDateKey();
   const week = thisWeek(today);
-  const doneCount = week.filter((d) => done.has(d)).length;
 
   return (
     <View
-      style={styles.row}
+      className="flex-row items-center gap-1"
       accessible
-      accessibilityLabel={t('home.thisWeekCount', { count: doneCount })}>
-      <AppText variant="caption" color="textMuted" style={styles.label} numberOfLines={1}>
+      accessibilityLabel={t('home.thisWeekCount', { count: week.filter((d) => done.has(d)).length })}>
+      <Text className="text-muted-foreground mr-1 shrink-0 text-xs font-medium" numberOfLines={1}>
         {t('home.thisWeek')}
-      </AppText>
-      {week.map((day) => {
-        const checked = done.has(day);
-        const future = day > today;
-        return (
-          <AppText
-            key={day}
-            variant="caption"
-            color={checked ? 'accent' : future ? 'border' : 'textMuted'}
-            style={[styles.letter, checked && styles.checked, day === today && styles.today]}>
-            {weekdayInitial(day, i18n.language)}
-          </AppText>
-        );
-      })}
+      </Text>
+      {week.map((day) => (
+        <Text
+          key={day}
+          className={cn(
+            'w-3 text-center text-xs font-medium',
+            done.has(day) ? 'text-primary font-extrabold' : day > today ? 'text-subtle' : 'text-muted-foreground',
+            day === today && 'underline'
+          )}>
+          {weekdayInitial(day, i18n.language)}
+        </Text>
+      ))}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  label: { marginRight: Spacing.xs, flexShrink: 0 },
-  letter: { width: 12, textAlign: 'center' },
-  checked: { fontWeight: '800' },
-  today: { textDecorationLine: 'underline' },
-});

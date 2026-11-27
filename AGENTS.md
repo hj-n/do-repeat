@@ -39,3 +39,13 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## UI components (Do Repeat)
+
+- **Do not hand-build UI components.** Use the shadcn/ui components for React Native from [React Native Reusables](https://github.com/founded-labs/react-native-reusables) (Uniwind variant), kept in `src/components/ui/`.
+  - To add one: `npx @react-native-reusables/cli@latest add <name> --styling-library uniwind`, or copy `packages/registry/src/uniwind/components/ui/<name>.tsx` from that repo and change `@/registry/uniwind/...` imports to `@/components/ui/...` and `@/lib/utils`.
+  - Local edits to these files are marked with a `Do Repeat:` or `Uniwind 1.x:` comment; keep them when updating a component.
+- Style with Tailwind classes (`className`) through Uniwind. Colors are the CSS variables in `src/global.css` (`bg-primary`, `text-muted-foreground`, …). `src/constants/theme.ts` mirrors those values only for places that cannot take `className`.
+- Icons: lucide, imported through `src/lib/icons.ts` (one path per icon, never from the `lucide-react-native` root).
+- Design rules: no boxed cards; separate with spacing and `Separator`. Short copy. One accent color (`primary`), and none on settings-style screens (bold + check instead).
+- All user-facing text goes through i18n (`src/i18n/locales/en.ts` and `ko.ts`, same keys).

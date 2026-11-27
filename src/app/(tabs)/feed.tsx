@@ -1,17 +1,17 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
 import { EmptyState } from '@/components/empty-state';
-import { Icon } from '@/components/icon';
 import { ListScreen } from '@/components/list-screen';
 import { TextTabs } from '@/components/text-tabs';
-import { Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
 import { PostCard } from '@/features/feed/post-card';
 import { useExploreFeed, useFollowingFeed } from '@/features/feed/use-feed';
+import { Search } from '@/lib/icons';
 
 type FeedTab = 'following' | 'explore';
 
@@ -27,38 +27,26 @@ export default function FeedScreen() {
     <ListScreen
       edges={['top', 'left', 'right']}
       divided
-      gap={Spacing.xl}
       data={posts}
       keyExtractor={(p) => p.id}
       renderItem={(post) => <PostCard post={post} />}
       header={
         <>
-          <View style={styles.titleRow}>
-            <AppText variant="display" style={styles.title}>
-              {t('feed.title')}
-            </AppText>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('feed.findPeople')}
-              hitSlop={10}
-              onPress={() => router.push('/discover')}>
-              <Icon name="search" color="text" />
-            </Pressable>
+          <View className="flex-row items-center pt-2">
+            <Text className="flex-1 text-4xl font-extrabold tracking-tight">{t('feed.title')}</Text>
+            <Button variant="ghost" size="icon" accessibilityLabel={t('feed.findPeople')} onPress={() => router.push('/discover')}>
+              <Icon as={Search} className="size-6" />
+            </Button>
           </View>
-          <TextTabs<FeedTab>
-            value={tab}
-            onChange={setTab}
-            options={[
-              { value: 'following', label: t('feed.following') },
-              { value: 'explore', label: t('feed.explore') },
-            ]}
-          />
+          <TextTabs<FeedTab> value={tab} onValueChange={setTab} options={[{ value: 'following', label: t('feed.following') }, { value: 'explore', label: t('feed.explore') }]} />
         </>
       }
       empty={
         tab === 'following' ? (
           <EmptyState title={t('feed.emptyFollowingTitle')} body={t('feed.emptyFollowing')}>
-            <Button kind="text" label={t('feed.findPeople')} onPress={() => router.push('/discover')} />
+            <Button variant="link" onPress={() => router.push('/discover')}>
+              <Text>{t('feed.findPeople')}</Text>
+            </Button>
           </EmptyState>
         ) : (
           <EmptyState body={t('feed.emptyExplore')} />
@@ -67,8 +55,3 @@ export default function FeedScreen() {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  titleRow: { flexDirection: 'row', alignItems: 'center', paddingTop: Spacing.sm },
-  title: { flex: 1 },
-});

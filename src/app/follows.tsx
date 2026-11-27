@@ -25,25 +25,15 @@ export default function FollowsScreen() {
   return (
     <ListScreen
       data={people}
-      gap={0}
       keyExtractor={(p) => p.id}
       renderItem={(person) => <PersonRow person={person} right={<FollowButton person={person} />} />}
       header={
         <>
           <TopBar title={`@${username}`} fallback="/profile" />
-          <TextTabs<Tab>
-            value={tab}
-            onChange={setTab}
-            options={[
-              { value: 'followers', label: t('profile.followers') },
-              { value: 'following', label: t('profile.following') },
-            ]}
-          />
+          <TextTabs<Tab> value={tab} onValueChange={setTab} options={[{ value: 'followers', label: t('profile.followers') }, { value: 'following', label: t('profile.following') }]} />
         </>
       }
-      empty={
-        <EmptyState body={tab === 'followers' ? t('follows.emptyFollowers') : t('follows.emptyFollowing')} />
-      }
+      empty={<EmptyState body={tab === 'followers' ? t('follows.emptyFollowers') : t('follows.emptyFollowing')} />}
     />
   );
 }

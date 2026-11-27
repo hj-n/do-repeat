@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
-import { Avatar } from '@/components/avatar';
-import { Icon } from '@/components/icon';
-import { Spacing } from '@/constants/theme';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { Lock } from '@/lib/icons';
+
+import { UserAvatar } from './user-avatar';
 
 type Stat = { label: string; value: number; onPress?: () => void };
 
@@ -21,27 +22,27 @@ type ProfileHeaderProps = {
 /** 프로필 위쪽: 동그라미, 이름, @아이디, 숫자들을 한 줄로 */
 export function ProfileHeader({ displayName, username, isPrivate, privateLabel, stats, children }: ProfileHeaderProps) {
   return (
-    <View style={styles.wrap}>
-      <View style={styles.top}>
-        <Avatar name={displayName} size={64} />
-        <View style={styles.names}>
-          <View style={styles.nameLine}>
-            <AppText variant="title" numberOfLines={1} style={styles.name}>
+    <View className="gap-4">
+      <View className="flex-row items-center gap-4">
+        <UserAvatar name={displayName} className="size-16" textClassName="text-2xl" />
+        <View className="flex-1 gap-0.5">
+          <View className="flex-row items-center gap-1">
+            <Text className="shrink text-2xl font-bold tracking-tight" numberOfLines={1}>
               {displayName}
-            </AppText>
+            </Text>
             {isPrivate ? (
               <View accessible accessibilityLabel={privateLabel}>
-                <Icon name="lock" size={16} color="textMuted" strokeWidth={2} />
+                <Icon as={Lock} className="text-muted-foreground size-4" />
               </View>
             ) : null}
           </View>
-          <AppText color="textMuted" numberOfLines={1}>
+          <Text className="text-muted-foreground" numberOfLines={1}>
             @{username}
-          </AppText>
+          </Text>
         </View>
       </View>
 
-      <View style={styles.stats}>
+      <View className="flex-row flex-wrap gap-x-6 gap-y-1">
         {stats.map((stat) => (
           <Pressable
             key={stat.label}
@@ -49,11 +50,9 @@ export function ProfileHeader({ displayName, username, isPrivate, privateLabel, 
             accessibilityRole={stat.onPress ? 'button' : undefined}
             hitSlop={6}
             onPress={stat.onPress}
-            style={styles.stat}>
-            <AppText variant="bodyStrong" style={styles.number}>
-              {stat.value}
-            </AppText>
-            <AppText color="textMuted">{stat.label}</AppText>
+            className="flex-row items-baseline gap-1">
+            <Text className="font-semibold tabular-nums">{stat.value}</Text>
+            <Text className="text-muted-foreground">{stat.label}</Text>
           </Pressable>
         ))}
       </View>
@@ -61,14 +60,3 @@ export function ProfileHeader({ displayName, username, isPrivate, privateLabel, 
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: { gap: Spacing.lg },
-  top: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
-  names: { flex: 1, gap: 2 },
-  nameLine: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
-  name: { flexShrink: 1 },
-  stats: { flexDirection: 'row', flexWrap: 'wrap', columnGap: Spacing.xl, rowGap: Spacing.xs },
-  stat: { flexDirection: 'row', alignItems: 'baseline', gap: 4 },
-  number: { fontVariant: ['tabular-nums'] },
-});
