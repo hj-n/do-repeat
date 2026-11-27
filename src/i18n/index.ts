@@ -4,8 +4,6 @@ import { getLocales } from 'expo-localization';
 import { createInstance } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import { withParticle } from '@/lib/korean';
-
 import en from './locales/en';
 import ko from './locales/ko';
 
@@ -42,10 +40,5 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
   initAsync: false,
 });
-
-// 한국어 조사: "{{habit, objectParticle}}" → 운동을 / 독서를
-i18n.services.formatter?.add('objectParticle', (value, lng) =>
-  lng === 'ko' ? withParticle(String(value), '을', '를') : String(value),
-);
 
 export default i18n;

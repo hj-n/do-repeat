@@ -8,7 +8,7 @@ import { Button } from '@/components/button';
 import { EmptyState } from '@/components/empty-state';
 import { Icon } from '@/components/icon';
 import { ListScreen } from '@/components/list-screen';
-import { Segmented } from '@/components/segmented';
+import { TextTabs } from '@/components/text-tabs';
 import { Spacing } from '@/constants/theme';
 import { PostCard } from '@/features/feed/post-card';
 import { useExploreFeed, useFollowingFeed } from '@/features/feed/use-feed';
@@ -26,6 +26,8 @@ export default function FeedScreen() {
   return (
     <ListScreen
       edges={['top', 'left', 'right']}
+      divided
+      gap={Spacing.xl}
       data={posts}
       keyExtractor={(p) => p.id}
       renderItem={(post) => <PostCard post={post} />}
@@ -43,7 +45,7 @@ export default function FeedScreen() {
               <Icon name="search" color="text" />
             </Pressable>
           </View>
-          <Segmented<FeedTab>
+          <TextTabs<FeedTab>
             value={tab}
             onChange={setTab}
             options={[
@@ -56,9 +58,7 @@ export default function FeedScreen() {
       empty={
         tab === 'following' ? (
           <EmptyState title={t('feed.emptyFollowingTitle')} body={t('feed.emptyFollowing')}>
-            <View style={styles.emptyAction}>
-              <Button label={t('feed.findPeople')} onPress={() => router.push('/discover')} />
-            </View>
+            <Button kind="text" label={t('feed.findPeople')} onPress={() => router.push('/discover')} />
           </EmptyState>
         ) : (
           <EmptyState body={t('feed.emptyExplore')} />
@@ -71,5 +71,4 @@ export default function FeedScreen() {
 const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', paddingTop: Spacing.sm },
   title: { flex: 1 },
-  emptyAction: { marginTop: Spacing.sm },
 });

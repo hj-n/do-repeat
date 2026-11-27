@@ -6,6 +6,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 type TextFieldProps = TextInputProps & { label?: string };
 
+/** 입력칸: 테두리 없이 옅은 바탕 */
 export function TextField({ label, style, ...rest }: TextFieldProps) {
   const theme = useTheme();
   return (
@@ -18,12 +19,7 @@ export function TextField({ label, style, ...rest }: TextFieldProps) {
       <TextInput
         placeholderTextColor={theme.textMuted}
         accessibilityLabel={label}
-        style={[
-          styles.input,
-          Type.body,
-          { color: theme.text, backgroundColor: theme.surface, borderColor: theme.border },
-          style,
-        ]}
+        style={[styles.input, Type.body, { color: theme.text, backgroundColor: theme.surfaceMuted }, style]}
         {...rest}
       />
     </View>
@@ -33,7 +29,6 @@ export function TextField({ label, style, ...rest }: TextFieldProps) {
 const styles = StyleSheet.create({
   wrap: { gap: Spacing.sm },
   input: {
-    borderWidth: 1,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,

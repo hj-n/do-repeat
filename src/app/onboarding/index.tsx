@@ -32,15 +32,14 @@ export default function WhatDoYouRepeat() {
 
   return (
     <Screen footer={<Button label={t('common.next')} disabled={!ready} onPress={next} />}>
-      <StepHeader step={1} total={3} canGoBack={hasHabits} />
+      <View style={styles.top}>
+        <View style={styles.flex}>
+          <StepHeader step={1} total={3} canGoBack={hasHabits} />
+        </View>
+        <LanguageSwitch />
+      </View>
 
       <View style={styles.heading}>
-        <View style={styles.eyebrowRow}>
-          <AppText variant="caption" color="accent" style={styles.eyebrow}>
-            {t('onboarding.what.eyebrow')}
-          </AppText>
-          <LanguageSwitch />
-        </View>
         <AppText variant="display">{t('onboarding.what.title')}</AppText>
         <AppText color="textMuted">{t('onboarding.what.subtitle')}</AppText>
       </View>
@@ -77,13 +76,8 @@ export default function WhatDoYouRepeat() {
 }
 
 const styles = StyleSheet.create({
-  heading: { gap: Spacing.sm, paddingTop: Spacing.sm },
-  eyebrowRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.sm,
-  },
-  eyebrow: { letterSpacing: 1.5 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
+  flex: { flex: 1 },
+  heading: { gap: Spacing.sm, paddingTop: Spacing.lg },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
 });

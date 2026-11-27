@@ -85,20 +85,15 @@ export function LocationCheckIn({ habit }: { habit: Habit }) {
         <View style={styles.checking}>
           <ActivityIndicator size="large" color={theme.accent} />
           <AppText variant="bodyStrong">{t('checkIn.checking')}</AppText>
-          {place ? (
-            <AppText color="textMuted">{t('home.atPlace', { place: place.name })}</AppText>
-          ) : null}
+          {place ? <AppText color="textMuted">{place.name}</AppText> : null}
         </View>
       ) : (
         <View style={styles.failure}>
           {phase.kind === 'tooFar' && place ? (
             <Notice
               title={t('checkIn.tooFarTitle')}
-              body={t('checkIn.tooFar', { distance: formatDistance(phase.distance), place: place.name })}>
-              <AppText variant="label" color="textMuted" style={styles.regular}>
-                {t('checkIn.tooFarHint', { radius: place.radius })}
-              </AppText>
-            </Notice>
+              body={t('checkIn.tooFar', { distance: formatDistance(phase.distance), place: place.name })}
+            />
           ) : null}
           {phase.kind === 'denied' ? (
             <Notice title={t('checkIn.deniedTitle')} body={t('checkIn.denied')} />
@@ -112,7 +107,7 @@ export function LocationCheckIn({ habit }: { habit: Habit }) {
 
           <Button label={t('common.retry')} onPress={retry} />
           {phase.kind === 'denied' ? (
-            <Button kind="secondary" label={t('common.openSettings')} onPress={() => Linking.openSettings()} />
+            <Button kind="text" centered label={t('common.openSettings')} onPress={() => Linking.openSettings()} />
           ) : null}
         </View>
       )}
@@ -126,5 +121,4 @@ const styles = StyleSheet.create({
   wrap: { flex: 1, gap: Spacing.xxl, justifyContent: 'space-between' },
   checking: { alignItems: 'center', gap: Spacing.md, paddingTop: 96 },
   failure: { gap: Spacing.md, paddingTop: Spacing.xl },
-  regular: { fontWeight: '400' },
 });

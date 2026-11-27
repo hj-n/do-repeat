@@ -1,16 +1,18 @@
 import { router } from 'expo-router';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
+import { Divider } from '@/components/divider';
 import { Screen } from '@/components/screen';
 import { Spacing } from '@/constants/theme';
-import { HabitCard } from '@/features/habits/habit-card';
+import { HabitRow } from '@/features/habits/habit-row';
 import { formatToday } from '@/lib/dates';
 import { useAppStore } from '@/store/app-store';
 
-/** 홈: 오늘 날짜와 나의 반복 카드들 */
+/** 홈: 오늘 날짜와 반복 목록 */
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
   const habits = useAppStore((s) => s.habits);
@@ -18,27 +20,26 @@ export default function HomeScreen() {
   return (
     <Screen edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <View style={styles.headerText}>
-          <AppText variant="label" color="textMuted">
-            {formatToday(i18n.language)}
-          </AppText>
-          <AppText variant="display">{t('home.title')}</AppText>
-        </View>
+        <AppText variant="label" color="textMuted">
+          {formatToday(i18n.language)}
+        </AppText>
+        <AppText variant="display">{t('home.title')}</AppText>
       </View>
 
-      <View style={styles.list}>
-        {habits.map((habit) => (
-          <HabitCard key={habit.id} habit={habit} />
+      <View>
+        {habits.map((habit, i) => (
+          <Fragment key={habit.id}>
+            {i > 0 ? <Divider /> : null}
+            <HabitRow habit={habit} />
+          </Fragment>
         ))}
       </View>
 
-      <Button kind="secondary" label={t('home.addHabit')} onPress={() => router.push('/onboarding')} />
+      <Button kind="text" label={`+ ${t('home.addHabit')}`} onPress={() => router.push('/onboarding')} />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'flex-start', paddingTop: Spacing.sm },
-  headerText: { flex: 1, gap: Spacing.xs },
-  list: { gap: Spacing.lg },
+  header: { gap: Spacing.xs, paddingTop: Spacing.sm },
 });

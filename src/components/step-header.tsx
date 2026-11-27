@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
 import { BackButton } from '@/components/back-button';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -27,17 +26,13 @@ export function StepHeader({ step, total, canGoBack = false }: StepHeaderProps) 
           />
         ))}
       </View>
-      <AppText variant="caption" color="textMuted" style={styles.count}>
-        {step} / {total}
-      </AppText>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, minHeight: 40 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, minHeight: 40, paddingRight: 28 },
   spacer: { width: 28 },
   bars: { flex: 1, flexDirection: 'row', gap: Spacing.xs },
-  bar: { flex: 1, height: 4, borderRadius: Radius.pill },
-  count: { width: 32, textAlign: 'right', fontVariant: ['tabular-nums'] },
+  bar: { flex: 1, height: 3, borderRadius: Radius.pill },
 });

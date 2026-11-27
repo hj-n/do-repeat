@@ -5,18 +5,18 @@ import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
-import { OptionCard } from '@/components/option-card';
+import { Divider } from '@/components/divider';
+import { OptionRow } from '@/components/option-row';
 import { Screen } from '@/components/screen';
 import { StepHeader } from '@/components/step-header';
 import { Spacing } from '@/constants/theme';
-import { habitTitle, isPresetId, type VerifyMethod } from '@/lib/habits';
+import { type VerifyMethod } from '@/lib/habits';
 
 /** 온보딩 2단계: 인증 방법 고르기 */
 export default function VerifyMethodScreen() {
   const { t } = useTranslation();
   const { preset, custom } = useLocalSearchParams<{ preset?: string; custom?: string }>();
   const [method, setMethod] = useState<VerifyMethod | null>(null);
-  const name = habitTitle({ preset: isPresetId(preset) ? preset : undefined, customTitle: custom }, t);
 
   const next = () => {
     if (!method) return;
@@ -33,20 +33,18 @@ export default function VerifyMethodScreen() {
 
       <View style={styles.heading}>
         <AppText variant="title">{t('onboarding.method.title')}</AppText>
-        <AppText color="textMuted">{t('onboarding.method.subtitle', { habit: name })}</AppText>
       </View>
 
-      <View style={styles.options}>
-        <OptionCard
-          badge={t('method.location')}
-          title={t('onboarding.method.locationTitle')}
+      <View>
+        <OptionRow
+          title={t('method.location')}
           description={t('onboarding.method.locationDescription')}
           selected={method === 'location'}
           onPress={() => setMethod('location')}
         />
-        <OptionCard
-          badge={t('method.photo')}
-          title={t('onboarding.method.photoTitle')}
+        <Divider />
+        <OptionRow
+          title={t('method.photo')}
           description={t('onboarding.method.photoDescription')}
           selected={method === 'photo'}
           onPress={() => setMethod('photo')}
@@ -58,5 +56,4 @@ export default function VerifyMethodScreen() {
 
 const styles = StyleSheet.create({
   heading: { gap: Spacing.sm, paddingTop: Spacing.lg },
-  options: { gap: Spacing.md },
 });

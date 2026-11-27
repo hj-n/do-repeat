@@ -5,22 +5,22 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
+import { Icon } from '@/components/icon';
 import { Screen } from '@/components/screen';
 import { StepHeader } from '@/components/step-header';
 import { TextField } from '@/components/text-field';
-import { Radius, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { Notice } from '@/features/check-in/notice';
+import { finishOnboarding } from '@/features/onboarding/finish';
 import { useTheme } from '@/hooks/use-theme';
 import type { Coordinates } from '@/lib/geo';
 import { DEFAULT_RADIUS, isPresetId } from '@/lib/habits';
 import { getCurrentPosition, isSimulatedLocation } from '@/lib/location';
 import { useAppStore } from '@/store/app-store';
 
-import { finishOnboarding } from '@/features/onboarding/finish';
-
 type Spot = { coords: Coordinates; accuracy: number | null };
 
-/** 온보딩 3단계 (위치 인증): 지금 있는 곳을 내 장소로 등록 */
+/** 온보딩 3단계 (위치 인증): 지금 있는 곳을 내 장소로 저장 */
 export default function PlaceScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -72,41 +72,33 @@ export default function PlaceScreen() {
         maxLength={24}
       />
 
-      <View style={[styles.spot, { backgroundColor: theme.surface, borderColor: spot ? theme.accent : theme.border }]}>
+      <View style={styles.spot}>
         {locating ? (
           <View style={styles.row}>
             <ActivityIndicator color={theme.accent} />
             <AppText color="textMuted">{t('onboarding.place.locating')}</AppText>
           </View>
         ) : spot ? (
-          <View style={styles.saved}>
-            <AppText variant="bodyStrong" color="accent">
+          <View style={styles.row}>
+            <Icon name="pin" size={20} color="accent" strokeWidth={2} />
+            <AppText variant="bodyStrong" color="accent" style={styles.flex}>
               {t('onboarding.place.saved', { accuracy: Math.round(spot.accuracy ?? 0) })}
             </AppText>
-            <AppText variant="label" color="textMuted" style={styles.regular}>
-              {t('onboarding.place.radiusNote', { radius: DEFAULT_RADIUS })}
-            </AppText>
+            <Button kind="text" centered label={t('onboarding.place.relocate')} onPress={locate} />
           </View>
-        ) : null}
-        <Button
-          kind={spot ? 'secondary' : 'primary'}
-          label={spot ? t('onboarding.place.relocate') : t('onboarding.place.useCurrent')}
-          disabled={locating}
-          onPress={locate}
-        />
+        ) : (
+          <Button kind="secondary" label={t('onboarding.place.useCurrent')} onPress={locate} />
+        )}
+        <AppText variant="caption" color="textMuted">
+          {isSimulatedLocation
+            ? `${t('onboarding.place.radiusNote', { radius: DEFAULT_RADIUS })} · ${t('settings.previewNote')}`
+            : t('onboarding.place.radiusNote', { radius: DEFAULT_RADIUS })}
+        </AppText>
       </View>
 
-      {problem === 'denied' ? (
-        <Notice title={t('checkIn.deniedTitle')} body={t('checkIn.denied')} />
-      ) : null}
+      {problem === 'denied' ? <Notice title={t('checkIn.deniedTitle')} body={t('checkIn.denied')} /> : null}
       {problem === 'unavailable' ? (
         <Notice title={t('checkIn.unavailableTitle')} body={t('checkIn.unavailable')} />
-      ) : null}
-
-      {isSimulatedLocation ? (
-        <AppText variant="caption" color="textMuted">
-          {t('settings.previewNote')}
-        </AppText>
       ) : null}
     </Screen>
   );
@@ -114,8 +106,7 @@ export default function PlaceScreen() {
 
 const styles = StyleSheet.create({
   heading: { gap: Spacing.sm, paddingTop: Spacing.lg },
-  spot: { borderWidth: 1.5, borderRadius: Radius.lg, padding: Spacing.lg, gap: Spacing.lg },
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  saved: { gap: Spacing.xs },
-  regular: { fontWeight: '400' },
+  spot: { gap: Spacing.sm },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, minHeight: 52 },
+  flex: { flex: 1 },
 });

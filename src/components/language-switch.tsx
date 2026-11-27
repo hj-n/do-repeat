@@ -1,22 +1,19 @@
 import { useTranslation } from 'react-i18next';
 
-import { Segmented } from '@/components/segmented';
-import type { AppLanguage } from '@/i18n';
+import { Button } from '@/components/button';
 import { useAppStore } from '@/store/app-store';
 
-/** EN | 한국어 전환. 고르면 기기 언어 대신 그 언어로 고정됩니다. */
+/** 다른 언어 이름을 보여주는 글자 버튼: 한국어 화면에서는 "English", 영어 화면에서는 "한국어" */
 export function LanguageSwitch() {
   const { t, i18n } = useTranslation();
   const setLanguage = useAppStore((s) => s.setLanguage);
+  const other = i18n.language === 'ko' ? 'en' : 'ko';
   return (
-    <Segmented<AppLanguage>
+    <Button
+      kind="text"
+      label={t(`language.${other}`)}
       accessibilityLabel={t('settings.language')}
-      value={i18n.language === 'ko' ? 'ko' : 'en'}
-      onChange={setLanguage}
-      options={[
-        { value: 'en', label: 'EN' },
-        { value: 'ko', label: '한국어' },
-      ]}
+      onPress={() => setLanguage(other)}
     />
   );
 }

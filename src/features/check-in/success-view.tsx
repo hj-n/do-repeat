@@ -13,7 +13,7 @@ import { NOTE_MAX, useAppStore } from '@/store/app-store';
 type SuccessViewProps = {
   habitName: string;
   streak: number;
-  /** true면 "오늘은 이미 인증했어요" */
+  /** true면 "오늘은 이미 했어요" */
   already?: boolean;
   photoUri?: string;
   /** 방금 만든 인증 id. 있으면 한마디를 남기거나 고칠 수 있어요 */
@@ -51,64 +51,36 @@ export function SuccessView({ habitName, streak, already, photoUri, checkInId }:
 
   return (
     <View style={styles.wrap}>
-      <Animated.View
-        style={[
-          styles.stamp,
-          { backgroundColor: theme.accent, opacity, transform: [{ scale }, { rotate: '-8deg' }] },
-        ]}>
-        <AppText variant="caption" color="onAccent" style={styles.stampLabel}>
-          {habitName}
-        </AppText>
-        <AppText variant="display" color="onAccent" style={styles.stampCount}>
-          D+{streak}
-        </AppText>
-      </Animated.View>
-
-      <View style={styles.texts}>
-        <AppText variant="title" style={styles.center}>
-          {already ? t('success.alreadyTitle') : t('success.title')}
-        </AppText>
-        <AppText color="textMuted" style={styles.center}>
-          {t('success.streak', { count: streak })}
+      <View style={styles.center}>
+        <Animated.View
+          accessible
+          accessibilityLabel={`${habitName} D+${streak}`}
+          style={[
+            styles.stamp,
+            { backgroundColor: theme.accent, opacity, transform: [{ scale }, { rotate: '-8deg' }] },
+          ]}>
+          <AppText variant="caption" color="onAccent" style={styles.stampLabel}>
+            {habitName}
+          </AppText>
+          <AppText variant="display" color="onAccent" style={styles.stampCount}>
+            D+{streak}
+          </AppText>
+        </Animated.View>
+        <AppText color="textMuted">
+          {already ? t('success.alreadyTitle') : t('success.streak', { count: streak })}
         </AppText>
       </View>
 
-      {photoUri ? (
-        <Image source={{ uri: photoUri }} style={styles.photo} accessibilityIgnoresInvertColors />
-      ) : null}
-
+      {photoUri ? <Image source={{ uri: photoUri }} style={styles.photo} accessibilityIgnoresInvertColors /> : null}
       {checkInId ? <NoteEditor checkInId={checkInId} /> : null}
 
-      <View style={styles.button}>
-        <Button label={t('common.backHome')} onPress={() => router.dismissTo('/home')} />
-      </View>
+      <Button label={t('common.backHome')} onPress={() => router.dismissTo('/home')} />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.xl, paddingVertical: Spacing.xxl },
-  stamp: {
-    width: 184,
-    height: 184,
-    borderRadius: 92,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.xs,
-  },
-  stampLabel: { letterSpacing: 0.5, maxWidth: 140, textAlign: 'center' },
-  stampCount: { fontSize: 48, lineHeight: 54, fontVariant: ['tabular-nums'] },
-  texts: { gap: Spacing.xs, alignItems: 'center' },
-  center: { textAlign: 'center' },
-  photo: { width: 120, height: 160, borderRadius: Radius.md },
-  button: { alignSelf: 'stretch' },
-  note: { alignSelf: 'stretch', borderWidth: 1, borderRadius: Radius.lg, padding: Spacing.lg, gap: Spacing.sm },
-  noteForm: { alignSelf: 'stretch', gap: Spacing.sm },
-});
-
 /** 인증 게시물에 한마디 남기기 / 고치기 */
 function NoteEditor({ checkInId }: { checkInId: string }) {
-  const theme = useTheme();
   const { t } = useTranslation();
   const saved = useAppStore((s) => s.checkIns.find((c) => c.id === checkInId)?.note);
   const setCheckInNote = useAppStore((s) => s.setCheckInNote);
@@ -117,18 +89,15 @@ function NoteEditor({ checkInId }: { checkInId: string }) {
 
   if (!editing && saved) {
     return (
-      <View style={[styles.note, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-        <AppText variant="caption" color="accent">
-          {t('note.saved')}
-        </AppText>
-        <AppText>{saved}</AppText>
-        <Button kind="secondary" size="small" label={t('note.edit')} onPress={() => setEditing(true)} />
+      <View style={styles.saved}>
+        <AppText style={styles.flex}>{saved}</AppText>
+        <Button kind="text" label={t('note.edit')} onPress={() => setEditing(true)} />
       </View>
     );
   }
 
   return (
-    <View style={styles.noteForm}>
+    <View style={styles.form}>
       <NoteField
         label={t('note.label')}
         value={draft}
@@ -136,15 +105,37 @@ function NoteEditor({ checkInId }: { checkInId: string }) {
         placeholder={t('note.placeholder')}
         max={NOTE_MAX}
       />
-      <Button
-        kind="secondary"
-        label={t('note.save')}
-        disabled={draft.trim().length === 0}
-        onPress={() => {
-          setCheckInNote(checkInId, draft);
-          setEditing(false);
-        }}
-      />
+      <View style={styles.saveRow}>
+        <Button
+          kind="text"
+          label={t('note.save')}
+          disabled={draft.trim().length === 0}
+          onPress={() => {
+            setCheckInNote(checkInId, draft);
+            setEditing(false);
+          }}
+        />
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrap: { flex: 1, gap: Spacing.xl, paddingVertical: Spacing.xl },
+  center: { alignItems: 'center', gap: Spacing.lg, paddingVertical: Spacing.lg },
+  stamp: {
+    width: 176,
+    height: 176,
+    borderRadius: 88,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+  },
+  stampLabel: { letterSpacing: 0.5, maxWidth: 130, textAlign: 'center' },
+  stampCount: { fontSize: 46, lineHeight: 52, fontVariant: ['tabular-nums'] },
+  photo: { width: 96, height: 128, borderRadius: Radius.md, alignSelf: 'center' },
+  saved: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md },
+  flex: { flex: 1 },
+  form: { gap: Spacing.xs },
+  saveRow: { alignItems: 'flex-end' },
+});

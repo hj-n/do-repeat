@@ -10,7 +10,7 @@ type ChipProps = {
   onPress?: () => void;
 };
 
-/** 고를 수 있는 작은 알약 모양 버튼 (예: 운동, 독서) */
+/** 고를 수 있는 작은 알약 (예: 운동, 독서). 테두리 없이 바탕색으로만 구분 */
 export function Chip({ label, selected, onPress }: ChipProps) {
   const theme = useTheme();
   return (
@@ -20,10 +20,7 @@ export function Chip({ label, selected, onPress }: ChipProps) {
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
-        {
-          backgroundColor: selected ? theme.accent : theme.surface,
-          borderColor: selected ? theme.accent : theme.border,
-        },
+        { backgroundColor: selected ? theme.accent : theme.surfaceMuted },
         pressed && styles.pressed,
       ]}>
       <AppText variant="label" color={selected ? 'onAccent' : 'text'}>
@@ -35,10 +32,9 @@ export function Chip({ label, selected, onPress }: ChipProps) {
 
 const styles = StyleSheet.create({
   base: {
-    borderWidth: 1,
     borderRadius: Radius.pill,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md - 2,
+    paddingVertical: Spacing.sm + 2,
   },
   pressed: { opacity: 0.8 },
 });

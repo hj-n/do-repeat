@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/empty-state';
 import { ListScreen } from '@/components/list-screen';
-import { Segmented } from '@/components/segmented';
+import { TextTabs } from '@/components/text-tabs';
 import { TopBar } from '@/components/top-bar';
 import { SAMPLE_PEOPLE } from '@/data/sample-people';
 import { FollowButton } from '@/features/social/follow-button';
@@ -31,7 +31,7 @@ export default function FollowsScreen() {
       header={
         <>
           <TopBar title={`@${username}`} fallback="/profile" />
-          <Segmented<Tab>
+          <TextTabs<Tab>
             value={tab}
             onChange={setTab}
             options={[
