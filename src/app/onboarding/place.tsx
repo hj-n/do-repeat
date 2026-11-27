@@ -84,7 +84,7 @@ export default function PlaceScreen() {
             <AppText variant="bodyStrong" color="accent" style={styles.flex}>
               {t('onboarding.place.saved', { accuracy: Math.round(spot.accuracy ?? 0) })}
             </AppText>
-            <Button kind="text" centered label={t('onboarding.place.relocate')} onPress={locate} />
+            <Button kind="text" align="center" label={t('onboarding.place.relocate')} onPress={locate} />
           </View>
         ) : (
           <Button kind="secondary" label={t('onboarding.place.useCurrent')} onPress={locate} />

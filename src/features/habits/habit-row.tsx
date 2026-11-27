@@ -9,9 +9,9 @@ import { useTheme } from '@/hooks/use-theme';
 import { habitTitle } from '@/lib/habits';
 import { useCheckInDays, useStreak, type Habit } from '@/store/app-store';
 
-import { WeekDots } from './week-dots';
+import { WeekLetters } from './week-letters';
 
-/** 홈의 반복 한 줄: 이름 · 최근 7일 · D+N · 체크 버튼 */
+/** 홈의 반복 한 줄: 이름 · 이번 주 · N일째 · 체크 버튼 */
 export function HabitRow({ habit }: { habit: Habit }) {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -23,18 +23,26 @@ export function HabitRow({ habit }: { habit: Habit }) {
   return (
     <View style={styles.row}>
       <View style={styles.info}>
-        <AppText variant="bodyStrong" style={styles.name} numberOfLines={1}>
-          {name}
-        </AppText>
-        <AppText variant="label" color="textMuted" numberOfLines={1} style={styles.regular}>
-          {habit.place?.name ?? t(`method.${habit.method}`)}
-        </AppText>
-        <WeekDots days={days} />
+        <View style={styles.titleLine}>
+          <AppText variant="bodyStrong" style={styles.name} numberOfLines={1}>
+            {name}
+          </AppText>
+          <AppText variant="label" color="textMuted" numberOfLines={1} style={styles.meta}>
+            {habit.place?.name ?? t(`method.${habit.method}`)}
+          </AppText>
+        </View>
+        <WeekLetters days={days} />
       </View>
 
-      <AppText variant="title" color={streak.current > 0 ? 'accent' : 'textMuted'} style={styles.count}>
-        D+{streak.current}
-      </AppText>
+      {streak.current > 0 ? (
+        <AppText variant="title" color="accent" style={styles.count}>
+          {t('streak.day', { count: streak.current })}
+        </AppText>
+      ) : (
+        <AppText variant="label" color="textMuted">
+          {t('streak.start')}
+        </AppText>
+      )}
 
       <Pressable
         accessibilityRole="button"
@@ -48,12 +56,7 @@ export function HabitRow({ habit }: { habit: Habit }) {
           done ? { backgroundColor: theme.accent } : { borderWidth: 1.5, borderColor: theme.border },
           pressed && styles.pressed,
         ]}>
-        <Icon
-          name="check"
-          size={20}
-          color={done ? 'onAccent' : 'border'}
-          strokeWidth={done ? 2.6 : 2.2}
-        />
+        <Icon name="check" size={20} color={done ? 'onAccent' : 'border'} strokeWidth={done ? 2.6 : 2.2} />
       </Pressable>
     </View>
   );
@@ -61,9 +64,10 @@ export function HabitRow({ habit }: { habit: Habit }) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg, paddingVertical: Spacing.lg },
-  info: { flex: 1, gap: 4 },
-  name: { fontSize: 17 },
-  regular: { fontWeight: '400' },
+  info: { flex: 1, gap: Spacing.sm },
+  titleLine: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.sm },
+  name: { fontSize: 17, flexShrink: 0 },
+  meta: { flexShrink: 1, fontWeight: '400' },
   count: { fontVariant: ['tabular-nums'] },
   check: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.7 },

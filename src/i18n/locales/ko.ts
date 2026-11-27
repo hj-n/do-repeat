@@ -53,7 +53,8 @@ const ko: Translation = {
     },
   },
   home: {
-    title: '오늘',
+    thisWeek: '이번 주',
+    thisWeekCount: '이번 주 {{count}}일',
     checkIn: '인증',
     checkedIn: '완료',
     addHabit: '추가',
@@ -75,13 +76,18 @@ const ko: Translation = {
     choosePhoto: '사진 고르기',
     retake: '다시 찍기',
     usePhoto: '인증',
+    addPhoto: '사진 추가',
+    removePhoto: '사진 빼기',
     cameraDeniedTitle: '카메라 권한이 꺼져 있어요',
     cameraDenied: '설정에서 허용해 주세요.',
     photoError: '카메라를 열 수 없어요.',
   },
   success: {
     alreadyTitle: '오늘은 이미 했어요',
-    streak: '{{count}}일 연속',
+  },
+  streak: {
+    day: '{{count}}일째',
+    start: '오늘부터',
   },
   note: {
     label: '한마디',
@@ -108,7 +114,7 @@ const ko: Translation = {
     emptyFollowingTitle: '아직 없어요',
     emptyFollowing: '팔로우하면 여기에 보여요.',
     emptyExplore: '아직 없어요.',
-    streakCaption: '{{habit}} D+{{days}}',
+    streakCaption: '{{habit}} {{days}}일째',
     milestone: '{{habit}} {{days}}일 연속',
     onlyMe: '나만 보기',
     sampleNote: '예시 사용자예요',

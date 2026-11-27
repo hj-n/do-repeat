@@ -74,10 +74,10 @@ export default function SettingsScreen() {
             accessibilityLabel={t('settings.privateAccount')}
             value={profile.isPrivate}
             onValueChange={(isPrivate) => updateProfile({ isPrivate })}
-            trackColor={{ false: theme.surfaceMuted, true: theme.accent }}
-            thumbColor={theme.surface}
+            trackColor={{ false: theme.surfaceMuted, true: theme.text }}
+            thumbColor={theme.background}
             // 웹(react-native-web)은 켜진 상태의 동그라미 색을 따로 받아요
-            {...(Platform.OS === 'web' ? ({ activeThumbColor: theme.surface } as object) : {})}
+            {...(Platform.OS === 'web' ? ({ activeThumbColor: theme.background } as object) : {})}
           />
         </View>
         {(
@@ -106,6 +106,7 @@ export default function SettingsScreen() {
           <Fragment key={option.value}>
             {i > 0 ? <Divider /> : null}
             <OptionRow
+              tone="neutral"
               title={option.label}
               selected={option.value === language}
               onPress={() => setLanguage(option.value)}
@@ -121,6 +122,7 @@ export default function SettingsScreen() {
             <Button
               key={tool.label}
               kind="text"
+              tone="neutral"
               label={tool.label}
               disabled={tool.disabled}
               onPress={() => {
@@ -131,10 +133,11 @@ export default function SettingsScreen() {
           ))}
           {confirmReset ? (
             <View style={styles.confirm}>
-              <AppText color="danger">{t('settings.resetConfirm')}</AppText>
-              <Button kind="text" label={t('settings.resetNo')} onPress={() => setConfirmReset(false)} />
+              <AppText variant="bodyStrong">{t('settings.resetConfirm')}</AppText>
+              <Button kind="text" tone="neutral" label={t('settings.resetNo')} onPress={() => setConfirmReset(false)} />
               <Button
                 kind="text"
+                tone="neutral"
                 label={t('settings.resetYes')}
                 onPress={() => {
                   resetAll();
@@ -143,7 +146,7 @@ export default function SettingsScreen() {
               />
             </View>
           ) : (
-            <Button kind="text" label={t('settings.reset')} onPress={() => setConfirmReset(true)} />
+            <Button kind="text" tone="neutral" label={t('settings.reset')} onPress={() => setConfirmReset(true)} />
           )}
           {done ? (
             <AppText variant="caption" color="textMuted">

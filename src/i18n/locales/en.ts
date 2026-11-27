@@ -54,7 +54,8 @@ const en = {
     },
   },
   home: {
-    title: 'Today',
+    thisWeek: 'This week',
+    thisWeekCount: 'This week: {{count}} of 7',
     checkIn: 'Check in',
     checkedIn: 'Done',
     addHabit: 'Add',
@@ -76,13 +77,18 @@ const en = {
     choosePhoto: 'Choose photo',
     retake: 'Retake',
     usePhoto: 'Check in',
+    addPhoto: 'Add photo',
+    removePhoto: 'Remove photo',
     cameraDeniedTitle: 'Camera is off',
     cameraDenied: 'Allow it in Settings.',
     photoError: 'Couldn’t open the camera.',
   },
   success: {
     alreadyTitle: 'Already done today',
-    streak: '{{count}}-day streak',
+  },
+  streak: {
+    day: 'Day {{count}}',
+    start: 'Start today',
   },
   note: {
     label: 'Note',
@@ -109,7 +115,7 @@ const en = {
     emptyFollowingTitle: 'Nothing here yet',
     emptyFollowing: 'Follow people to see their check-ins.',
     emptyExplore: 'Nothing yet.',
-    streakCaption: '{{habit}} D+{{days}}',
+    streakCaption: '{{habit}} · Day {{days}}',
     milestone: '{{days}} days of {{habit}}',
     onlyMe: 'Only you',
     sampleNote: 'Sample people',

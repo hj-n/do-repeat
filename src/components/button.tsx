@@ -17,9 +17,13 @@ type ButtonProps = {
   /** small: 목록 안의 작은 버튼 (팔로우, 수락 등) */
   size?: 'regular' | 'small';
   accessibilityLabel?: string;
-  /** 글자 버튼을 가운데에 둘지 (기본: 왼쪽) */
-  centered?: boolean;
+  /** 글자 버튼 위치 (기본: 왼쪽) */
+  align?: 'start' | 'center' | 'end';
+  /** 글자 버튼 색: accent(대표 색) / neutral(기본 글자색, 설정 화면처럼 색이 필요 없는 곳) */
+  tone?: 'accent' | 'neutral';
 };
+
+const ALIGN = { start: 'flex-start', center: 'center', end: 'flex-end' } as const;
 
 export function Button({
   label,
@@ -28,12 +32,13 @@ export function Button({
   kind = 'primary',
   size = 'regular',
   accessibilityLabel,
-  centered = false,
+  align = 'start',
+  tone = 'accent',
 }: ButtonProps) {
   const theme = useTheme();
   const small = size === 'small';
   const color =
-    kind === 'primary' ? (disabled ? 'textMuted' : 'onAccent') : kind === 'text' ? (disabled ? 'textMuted' : 'accent') : 'text';
+    kind === 'primary' ? (disabled ? 'textMuted' : 'onAccent') : kind === 'text' ? (disabled ? 'textMuted' : tone === 'neutral' ? 'text' : 'accent') : 'text';
 
   return (
     <Pressable
@@ -44,7 +49,7 @@ export function Button({
       onPress={onPress}
       hitSlop={kind === 'text' ? 8 : undefined}
       style={({ pressed }) => [
-        kind === 'text' ? [styles.text, centered && styles.centered] : [styles.base, small && styles.small],
+        kind === 'text' ? [styles.text, { alignSelf: ALIGN[align] }] : [styles.base, small && styles.small],
         kind === 'primary' && { backgroundColor: disabled ? theme.surfaceMuted : theme.accent },
         kind === 'secondary' && { backgroundColor: theme.surfaceMuted },
         pressed && !disabled && styles.pressed,
@@ -65,7 +70,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
   },
   small: { minHeight: 34, borderRadius: Radius.pill, paddingHorizontal: Spacing.lg },
-  text: { alignSelf: 'flex-start', paddingVertical: Spacing.xs },
-  centered: { alignSelf: 'center' },
+  text: { paddingVertical: Spacing.xs },
   pressed: { opacity: 0.7 },
 });

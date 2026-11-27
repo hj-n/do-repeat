@@ -94,6 +94,8 @@ type AppState = {
   ) => CheckIn | null;
   /** 인증에 한마디를 붙이거나 고칩니다 (빈 글이면 지움) */
   setCheckInNote: (checkInId: string, note: string) => void;
+  /** 인증에 사진을 붙이거나 뗍니다 (위치 인증에도 사진을 남길 수 있어요) */
+  setCheckInPhoto: (checkInId: string, photoUri: string | undefined) => void;
   addComment: (postId: string, text: string) => void;
   deleteComment: (commentId: string) => void;
   toggleLike: (postId: string) => void;
@@ -165,6 +167,11 @@ export const useAppStore = create<AppState>()(
           checkIns: s.checkIns.map((c) => (c.id === checkInId ? { ...c, note: clean || undefined } : c)),
         }));
       },
+
+      setCheckInPhoto: (checkInId, photoUri) =>
+        set((s) => ({
+          checkIns: s.checkIns.map((c) => (c.id === checkInId ? { ...c, photoUri } : c)),
+        })),
 
       addComment: (postId, text) => {
         const clean = text.trim().slice(0, COMMENT_MAX);

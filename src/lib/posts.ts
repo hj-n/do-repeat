@@ -1,6 +1,6 @@
 /**
  * Feed posts. There are two kinds (no free-form posts, no selfies):
- * - checkIn: one day's proof (a place name or a photo) with D+N
+ * - checkIn: one day's proof (a place name or a photo) with its day count (Day N / N일째)
  * - milestone: "○○ hit a 30-day streak"
  */
 import type { ImageSourcePropType } from 'react-native';
@@ -23,7 +23,7 @@ type PostBase = {
   id: string;
   author: PostAuthor;
   habit: HabitRef;
-  /** Streak count on that day (D+N) */
+  /** Streak count on that day (shown as Day N / N일째) */
   days: number;
   at: string;
   visibility: Visibility;

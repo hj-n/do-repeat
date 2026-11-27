@@ -23,7 +23,12 @@ export default function HomeScreen() {
         <AppText variant="label" color="textMuted">
           {formatToday(i18n.language)}
         </AppText>
-        <AppText variant="display">{t('home.title')}</AppText>
+        <View style={styles.titleRow}>
+          <AppText variant="display">Do Repeat</AppText>
+          <AppText variant="display" color="accent" style={styles.count}>
+            {habits.length}
+          </AppText>
+        </View>
       </View>
 
       <View>
@@ -42,4 +47,6 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   header: { gap: Spacing.xs, paddingTop: Spacing.sm },
+  titleRow: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.sm },
+  count: { fontVariant: ['tabular-nums'] },
 });

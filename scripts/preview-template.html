@@ -2,25 +2,25 @@
 <style>
   /* Phone-sized app column, centered; framed like a device on wide screens. */
   :root {
-    --page: #e3e5ea;
-    --app: #f4f5f7;
-    --frame: #c9cdd6;
-    --hint: #5e6472;
+    --page: #f2f2f7;
+    --app: #ffffff;
+    --frame: #c7c7cc;
+    --hint: #6c6c70;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --page: #07080a;
-      --app: #0f1115;
-      --frame: #2c313a;
-      --hint: #9aa1ae;
+      --page: #1c1c1e;
+      --app: #000000;
+      --frame: #38383a;
+      --hint: #8e8e93;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --page: #07080a;
-    --app: #0f1115;
-    --frame: #2c313a;
-    --hint: #9aa1ae;
+    --page: #1c1c1e;
+    --app: #000000;
+    --frame: #38383a;
+    --hint: #8e8e93;
     color-scheme: dark;
   }
   html,
@@ -58,7 +58,7 @@
       border: 1px solid var(--frame);
       border-radius: 36px;
       overflow: hidden;
-      box-shadow: 0 24px 60px rgba(15, 17, 21, 0.18);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
     }
     .preview-hint {
       display: block;

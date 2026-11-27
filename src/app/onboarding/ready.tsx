@@ -33,12 +33,8 @@ export default function ReadyScreen() {
       </View>
 
       <View style={styles.summary}>
-        <AppText color="textMuted">
-          {habitTitle(draft, t)} · {t('method.photo')}
-        </AppText>
-        <AppText color="accent" style={styles.count}>
-          D+0
-        </AppText>
+        <AppText variant="display">{habitTitle(draft, t)}</AppText>
+        <AppText color="textMuted">{t('onboarding.method.photoDescription')}</AppText>
       </View>
     </Screen>
   );
@@ -47,5 +43,4 @@ export default function ReadyScreen() {
 const styles = StyleSheet.create({
   heading: { gap: Spacing.sm, paddingTop: Spacing.lg },
   summary: { paddingTop: Spacing.xl, gap: Spacing.xs },
-  count: { fontSize: 72, lineHeight: 80, fontWeight: '800', fontVariant: ['tabular-nums'] },
 });

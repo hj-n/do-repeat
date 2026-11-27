@@ -76,7 +76,9 @@ export function LocationCheckIn({ habit }: { habit: Habit }) {
     return <SuccessView habitName={habitTitle(habit, t)} streak={streak.current} already />;
   }
   if (phase.kind === 'success') {
-    return <SuccessView habitName={habitTitle(habit, t)} streak={phase.streak} checkInId={phase.checkInId} />;
+    return (
+      <SuccessView habitName={habitTitle(habit, t)} streak={phase.streak} checkInId={phase.checkInId} photoOptional />
+    );
   }
 
   return (
@@ -107,7 +109,7 @@ export function LocationCheckIn({ habit }: { habit: Habit }) {
 
           <Button label={t('common.retry')} onPress={retry} />
           {phase.kind === 'denied' ? (
-            <Button kind="text" centered label={t('common.openSettings')} onPress={() => Linking.openSettings()} />
+            <Button kind="text" align="center" label={t('common.openSettings')} onPress={() => Linking.openSettings()} />
           ) : null}
         </View>
       )}

@@ -5,37 +5,51 @@
  * 디자인을 바꾸고 싶으면 이 파일의 값만 바꾸면 앱 전체에 반영돼요.
  */
 
+/**
+ * 색은 Apple Human Interface Guidelines의 시스템 색을 기준으로 맞췄어요.
+ * https://developer.apple.com/design/human-interface-guidelines/color
+ * - 바탕·글자·구분선: iOS 시스템 회색 단계 (systemBackground, Gray 2~6, separator)
+ * - 대표 색: 처음 정한 파란색 (라이트 #2F49D1 / 다크 #8496FF)
+ * - 빨강: 오류와 좋아요에만, 덜 튀는 값
+ * 대표 색을 바꾸려면 accent / onAccent / accentSoft 세 값만 바꾸면 돼요.
+ */
 export const Colors = {
   light: {
-    /** 화면 전체 바탕 */
-    background: '#F4F5F7',
-    /** 카드, 입력창 같은 면 */
+    /** 화면 전체 바탕 (systemBackground) */
+    background: '#FFFFFF',
+    /** 탭 막대 같은 면 */
     surface: '#FFFFFF',
-    /** 선택 안 된 칩, 비활성 버튼 바탕 */
-    surfaceMuted: '#E9EBEF',
-    border: '#DCDFE5',
-    text: '#14161B',
-    textMuted: '#5E6472',
-    /** 대표 색: 버튼, 선택 표시, 연속 일수 */
+    /** 칩, 입력칸, 선택 막대의 바탕 (Gray 6) */
+    surfaceMuted: '#F2F2F7',
+    /** 구분선, 빈 체크 동그라미 (Gray 3) */
+    border: '#C7C7CC',
+    text: '#000000',
+    /** 보조 글자 (Gray, 고대비) */
+    textMuted: '#6C6C70',
+    /** 대표 색: 주요 버튼, N일째, 이번 주에 한 날 */
     accent: '#2F49D1',
     /** 대표 색 위에 올라가는 글자 */
     onAccent: '#FFFFFF',
-    /** 선택된 카드의 옅은 바탕 */
+    /** 대표 색의 옅은 바탕 (프로필 동그라미) */
     accentSoft: '#E4E8FB',
-    /** 오류, 실패 안내 */
+    /** 오류, 좋아요 */
     danger: '#C93A40',
     dangerSoft: '#FBE7E8',
   },
   dark: {
-    background: '#0F1115',
-    surface: '#181B21',
-    surfaceMuted: '#22262E',
-    border: '#2C313A',
-    text: '#F1F2F5',
-    textMuted: '#9AA1AE',
+    background: '#000000',
+    /** (Gray 6) */
+    surface: '#1C1C1E',
+    /** (Gray 5) */
+    surfaceMuted: '#2C2C2E',
+    /** (separator) */
+    border: '#38383A',
+    text: '#FFFFFF',
+    /** (Gray) */
+    textMuted: '#8E8E93',
     accent: '#8496FF',
-    onAccent: '#0F1115',
-    accentSoft: '#212849',
+    onAccent: '#000000',
+    accentSoft: '#1D2244',
     danger: '#FF7B81',
     dangerSoft: '#3A1E21',
   },

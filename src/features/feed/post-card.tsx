@@ -12,7 +12,7 @@ import type { Post } from '@/lib/posts';
 
 import { useComments, useLike } from './use-reactions';
 
-/** 피드 게시물 한 개 (상자 없이): 누가 · 무엇 · D+N · 한마디 · 좋아요/댓글 */
+/** 피드 게시물 한 개 (상자 없이): 누가 · 무엇 · N일째 · 한마디 · 좋아요/댓글 */
 export function PostCard({ post, linkComments = true }: { post: Post; linkComments?: boolean }) {
   const { t, i18n } = useTranslation();
   const habit = habitTitle(post.habit, t);
@@ -49,7 +49,7 @@ export function PostCard({ post, linkComments = true }: { post: Post; linkCommen
         </View>
       ) : (
         <>
-          {post.method === 'photo' && post.photo ? (
+          {post.photo ? (
             <Image source={post.photo} style={styles.photo} resizeMode="cover" accessibilityLabel={t('method.photo')} />
           ) : null}
           <View style={styles.texts}>

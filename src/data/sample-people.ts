@@ -61,7 +61,7 @@ export const SAMPLE_PEOPLE: Person[] = [
     isPrivate: false, checkInVisibility: 'public', milestoneVisibility: 'public',
     followerCount: 530, followingCount: 211,
     habits: [
-      { preset: 'exercise', method: 'location', placeName: 'Iron Works Gym', streak: 100, hoursAgo: 4, note: 'Leg day. 100 days without skipping one.' },
+      { preset: 'exercise', method: 'location', placeName: 'Iron Works Gym', photo: photos.dumbbell, streak: 100, hoursAgo: 4, note: 'Leg day. 100 days without skipping one.' },
       { preset: 'water', method: 'photo', photo: photos.water, streak: 7, hoursAgo: 6 },
     ],
   },

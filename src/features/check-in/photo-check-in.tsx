@@ -54,7 +54,6 @@ export function PhotoCheckIn({ habit }: { habit: Habit }) {
       <SuccessView
         habitName={habitTitle(habit, t)}
         streak={done.streak}
-        photoUri={photo ?? undefined}
         checkInId={done.checkInId}
       />
     );
@@ -91,7 +90,7 @@ export function PhotoCheckIn({ habit }: { habit: Habit }) {
         {photo ? (
           <>
             <Button label={t('checkIn.usePhoto')} onPress={submit} />
-            <Button kind="text" centered label={t('checkIn.retake')} onPress={shoot} />
+            <Button kind="text" align="center" label={t('checkIn.retake')} onPress={shoot} />
           </>
         ) : (
           <Button label={usesFilePicker ? t('checkIn.choosePhoto') : t('checkIn.takePhoto')} onPress={shoot} />

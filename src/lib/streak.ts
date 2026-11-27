@@ -29,6 +29,12 @@ export function lastDays(count: number, today: DateKey = toDateKey()): DateKey[]
   return Array.from({ length: count }, (_, i) => addDays(today, i - (count - 1)));
 }
 
+/** This calendar week, Sunday to Saturday. */
+export function thisWeek(today: DateKey = toDateKey()): DateKey[] {
+  const start = addDays(today, -fromDateKey(today).getDay());
+  return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+}
+
 export type StreakSummary = {
   /** Consecutive days up to today (or yesterday, if today isn't done yet). Shown as D+N. */
   current: number;
